@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.png" alt="Kubernetes" width="25"/>  Wakacyjne wyzwanie 2025 DevOps  <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.png" alt="Kubernetes" width="25"/>
+# <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.png" alt="Kubernetes" width="25"/>  Od zera do DevOps'a  <img src="https://raw.githubusercontent.com/kubernetes/kubernetes/master/logo/logo.png" alt="Kubernetes" width="25"/>
 W trakcie 5 modułów poznasz fundamenty pracy z Kubernetes, nauczysz się wdrażać aplikacje w klastrze i korzystać z narzędzi takich jak Helm czy K9s. Kurs zakończysz opcjonalnym projektem, w którym wykorzystasz zdobytą wiedzę w praktyce.
 
 
@@ -23,7 +23,7 @@ Mile widziana:
 
 ## 📖 Organizacyjne
 
-- Kurs trwa 5 tygodni – **1 moduł = 1 tydzień** + czas na projekt
+- Kurs trwa 5 tygodni
 - Co tydzień publikowany będzie nowy moduł z materiałem i zadaniami
 - Projekt końcowy jest **dobrowolny**, ale będzie szansą na wykazanie się
 - Pytania od uczestników mile widziane !!!
