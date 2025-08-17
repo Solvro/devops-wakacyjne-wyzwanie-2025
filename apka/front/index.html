@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Notatki</title>
+</head>
+<body>
+
+    <h1>Napisz coś od siebie</h1>
+    <input type="text" id="message" required>
+    <input id="post-note" type="button" value="Dodaj notatkę" onclick="postNote()">
+    <input id="get-note" type="button" value="Pobierz notatki" onclick="getNotes()">
+
+    <ul id="notes-list"></ul>
+
+    <script>
+        const API_URL = "http://backend-service:8000/notes";
+
+        async function postNote() {
+            const text = document.getElementById("message").value;
+
+            if (!text.trim()) {
+                alert("Wpisz coś!");
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                console.log("Dodano:", data);
+                document.getElementById("message").value = "";
+                getNotes(); // odśwież listę
+            } catch (error) {
+                console.error("Błąd POST:", error);
+            }
+        }
+
+        async function getNotes() {
+            try {
+                const response = await fetch(API_URL);
+                const notes = await response.json();
+
+                const list = document.getElementById("notes-list");
+                list.innerHTML = "";
+
+                notes.forEach(note => {
+                    const li = document.createElement("li");
+                    li.textContent = note.text;
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                console.error("Błąd GET:", error);
+            }
+        }
+    </script>
+</body>
+</html>
