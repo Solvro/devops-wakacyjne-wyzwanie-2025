@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+spec:
+  replicas: 1
+  
+  selector:
+    matchLabels:
+      app: sampleapptest
+      zadanie: two
+
+  template:
+
+    metadata:
+      labels:
+        app: sampleapptest
+        zadanie: two
+        
+    spec:
+      containers:
+      - name: sampleapp-db
+        image: mariadb
+
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu:  "100m"
+
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 3306
+
+        env:
+
+          - name: MARIADB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: testappsecret
+                key: dbrootpass
+
+          - name: MARIADB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: testappsecret
+                key: dbpass
+
+          - name: MARIADB_USER
+            valueFrom:
+              secretKeyRef:
+                name: testappsecret
+                key: dbuser
+
+          - name: MARIADB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: testappsecret
+                key: dbname
+
+        volumeMounts:
+          - name: mariadb-data           
+            mountPath: /var/lib/mysql
+
+      volumes:
+      - name: mariadb-data        
+        persistentVolumeClaim:
+          claimName: mariadb-pvc
+          readOnly: false
+
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-testapp-service
+spec:
+  selector:
+    app: sampleapptest
+    zadanie: two
+  ports:
+  - port: 3306
+    targetPort: 3306

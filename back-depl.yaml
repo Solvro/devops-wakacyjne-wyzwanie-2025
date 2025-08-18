@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: flask-backend
+          image: mikalaytsepl/flask-back:latest
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu:  "100m"
+              
+            limits:
+              memory: "256Mi"
+              cpu: "1000m"
+          env:
+            - name: DB_HOST
+              value: db-testapp-service
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: testappsecret
+                  key: dbuser
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: testappsecret
+                  key: dbpass
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: testappsecret
+                  key: dbname
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-testapp-service
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+  - port: 5000
+    targetPort: 5000
+
