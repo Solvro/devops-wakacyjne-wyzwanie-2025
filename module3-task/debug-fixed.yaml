@@ -1,0 +1,95 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webapp-config
+data:
+  APP_MODE: "production"
+  LOG_LEVEL: "info"
+nginx.conf: |
+  server {
+    listen 80;
+    server_name localhost;
+    location / {
+      root /usr/share/nginx/html;
+      index index.html;
+    }
+  }
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webapp-secrets
+type: Opaque # * Zmieniono na odpowiedni typ Secret
+data: # * Zmiana danych na wymagany przez K8s Base64
+  DB_USERNAME: "YWRtaW4=" # admin -> Base64 
+  DB_PASSWORD: "U3VwZXJTZWNyZXQxMjM=" # SuperSecret123 -> Base64 
+  API_KEY: "c2stMTIzNDU2Nzg5MGFiY2RlZg==" # sk-1234567890abcdef -> Base64 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: nginx:latest
+        ports:
+        - containerPort: 80    
+        envFrom: # * Użyto 'envFrom' do wstrzyknięcia wszystkich kluczy z ConfigMap i Secret jako zmiennych środowiskowych
+        - configMapRef:
+            name: webapp-config
+        - secretRef:
+            name: webapp-secrets
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/conf.d # * Lepsza ścieżka dla konfiguracji nginx
+          readOnly: true
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true # * Sekrety powinny być montowane jako tylko do odczytu dla bezpieczeństwa
+        startupProbe: 
+          httpGet: # * Zmieniono z exec dla enpointów dla health check
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 30
+      volumes:
+      - name: config-volume
+        configMap:
+          name: webapp-config
+          items: # * Dodano 'items', aby zamontować konkretny klucz jako plik
+          - key: nginx.conf
+            path: default.conf
+      - name: secret-volume
+        secret:
+          secretName: webapp-secrets
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: webapp-service
+spec:
+  selector:
+    app: webapp # * Selektor musi pasować do etykiet Podów w Deploymencie ('app: webapp')
+  ports:
+  - port: 80        
+    targetPort: 80      
+    nodePort: 30080 # * NodePort powinien być w domyślnym zakresie (30000-32767).
+  type: NodePort         
