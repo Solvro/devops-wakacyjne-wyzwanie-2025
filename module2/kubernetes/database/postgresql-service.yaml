@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  labels:
+    app: budzetownik
+    tier: database
+spec:
+  type: ClusterIP
+  selector:
+    app: budzetownik
+    tier: database
+  ports:
+    - port: 5432
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
