@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Mini App</title>
+</head>
+<body>
+<h1>Mini App — Frontend</h1>
+<input id="name" placeholder="Name" />
+<button onclick="add()">Dodaj</button>
+<button onclick="list()">Pobierz listę</button>
+<pre id="out"></pre>
+<script>
+async function add() {
+const name = document.getElementById('name').value || 'anon'
+const r = await fetch('/api/add', {
+method: 'POST',
+headers: {'Content-Type':'application/json'},
+body: JSON.stringify({name})
+})
+const data = await r.json()
+document.getElementById('out').innerText = JSON.stringify(data, null, 2)
+}
+async function list() {
+const r = await fetch('/api/list')
+const data = await r.json()
+document.getElementById('out').innerText = JSON.stringify(data, null, 2)
+}
+</script>
+</body>
+</html>
