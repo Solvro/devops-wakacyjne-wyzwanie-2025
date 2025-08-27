@@ -6,12 +6,13 @@ metadata:
     app: budzetownik
     tier: frontend
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: budzetownik
     tier: frontend
   ports:
-    - port: 80
-      targetPort: http
-      protocol: TCP
-      name: http
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+      nodePort: 30080
+  externalTrafficPolicy: Cluster
