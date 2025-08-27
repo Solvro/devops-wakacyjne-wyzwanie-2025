@@ -6,9 +6,6 @@ metadata:
     app: budzetownik
     tier: database
 spec:
-  selector:
-    app: budzetownik
-    tier: database
   accessModes:
     - ReadWriteOnce
   resources:

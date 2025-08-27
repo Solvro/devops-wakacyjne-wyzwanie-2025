@@ -3,9 +3,6 @@ kind: Job
 metadata:
   name: prisma-seed
 spec:
-  selector:
-    app: budzetownik
-    tier: database
   template:
     spec:
       containers:

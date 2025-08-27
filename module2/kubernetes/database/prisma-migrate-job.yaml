@@ -3,9 +3,6 @@ kind: Job
 metadata:
   name: prisma-migrate
 spec:
-  selector:
-    app: budzetownik
-    tier: database
   template:
     spec:
       containers:
