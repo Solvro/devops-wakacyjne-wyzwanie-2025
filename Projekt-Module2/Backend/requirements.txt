@@ -1,0 +1,5 @@
+Flask==2.3.3
+Flask-MySQLdb==1.0.1
+mysqlclient==2.1.1
+Flask-CORS==4.0.0
+mysql-connector-python
