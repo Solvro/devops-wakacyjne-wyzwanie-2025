@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-dev
+  labels:
+    environment: development
+    app: nginx
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      environment: development
+      app: nginx
+  template:
+    metadata:
+      labels:
+        environment: development
+        app: nginx
+        tier: frontend
+        version: "dev"
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80

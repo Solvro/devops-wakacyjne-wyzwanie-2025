@@ -1,0 +1,22 @@
+-- Użyj bazy danych
+USE testdb;
+
+-- Utwórz tabelę
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Dodaj przykładowe dane
+INSERT INTO users (name, email) VALUES 
+('Jan Kowalski', 'jan.kowalski@example.com'),
+('Anna Nowak', 'anna.nowak@example.com'),
+('Piotr Wiśniewski', 'piotr.wisniewski@example.com');
+
+-- Sprawdź dane
+SELECT * FROM users;
+
+-- Wyjdź z MySQL
+EXIT;

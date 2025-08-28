@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: backend-flask:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_NAME
+              value: mydb
+            - name: DB_USER
+              value: myuser
+            - name: DB_PASSWORD
+              value: mypassword
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
