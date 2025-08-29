@@ -1,0 +1,94 @@
+replicaCount: 3
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+volumes: 
+  - name: nginx
+    configMap:
+      name: nginx-config
+  - name: secret-volume
+    secret:
+      secretName: super-secret
+
+volumeMounts: 
+  - name: nginx
+    mountPath: "/usr/share/nginx/html"
+  - name: secret-volume
+    mountPath: "/etc/secret"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

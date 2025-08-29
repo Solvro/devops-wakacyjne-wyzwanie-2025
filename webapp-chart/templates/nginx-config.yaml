@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: nginx-config
+data:
+  index.html: "<img src='https://media.tenor.com/sbfBfp3FeY8AAAAm/oia-uia.webp' alt='smieszny gif'>"
+
