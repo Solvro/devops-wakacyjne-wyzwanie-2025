@@ -1,0 +1,16 @@
+apiVersion: v2
+name: webapp
+description: Helm dla apki webowej
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+maintainers:
+  - name: Weronika
+    email: 279897@student.pwr.edu.pl
+
+home: https://webapp.example.com
+keywords:
+  - webapp
+  - web
+  - nginx
