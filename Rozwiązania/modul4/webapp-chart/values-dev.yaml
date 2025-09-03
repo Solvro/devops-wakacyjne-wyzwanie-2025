@@ -1,0 +1,27 @@
+replicaCount: 1
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80
+  nodePort: 30088
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+
+config:
+  ENVIRONMENT: "development"
+  LOG_LEVEL: "DEBUG"
+  CACHE_TTL: "300"
+
+secrets:
+  DATABASE_PASSWORD: "dev123"
+  API_KEY: "sk-dev-key"

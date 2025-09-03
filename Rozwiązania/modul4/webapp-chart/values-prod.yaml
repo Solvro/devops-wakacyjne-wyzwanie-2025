@@ -1,0 +1,29 @@
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+config:
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "WARN"
+  CACHE_TTL: "7200"
+
+secrets:
+  DATABASE_PASSWORD: "prod-secure-pass-123"
+  API_KEY: "sk-prod-secure-key"
