@@ -25,7 +25,6 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           
-          # Health checks
           {{- if .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
@@ -36,11 +35,9 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           {{- end }}
           
-          # Resources
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           
-          # Environment variables z ConfigMap i Secret
           envFrom:
           - configMapRef:
               name: {{ include "webapp.fullname" . }}-config
