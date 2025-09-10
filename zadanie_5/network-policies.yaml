@@ -1,0 +1,239 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy 
+metadata:
+  name: front-netpol-dev
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  
+  policyTypes:
+    - Egress
+  
+  egress: # can communicate only with backend pods in it's namespace
+    
+    - to:
+      - podSelector:
+          matchLabels:
+            app: backend 
+      
+      ports:
+      - protocol: TCP
+        port: 8080   
+    
+    # allow k8s dns
+    - to:
+        - namespaceSelector: {} 
+      ports:
+        - protocol: UDP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy 
+metadata:
+  name: front-netpol-prod
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+  
+  policyTypes:
+    - Egress
+  
+  egress: # can communicate only with backend pods in it's namespace
+    
+    - to:
+      - podSelector:
+          matchLabels:
+            app: backend 
+      
+      ports:
+      - protocol: TCP
+        port: 8080   
+    
+    # allow k8s dns
+    - to:
+        - namespaceSelector: {} 
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol-dev
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  # allow 2 way communication from db and front
+  ingress:
+    
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 80
+
+
+  egress:
+
+    - to:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 80
+
+    - to:
+        - podSelector:
+            matchLabels:
+              app: database
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # allow dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol-prod
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  # allow 2 way communication from db and front
+  ingress:
+    
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 80
+
+  egress:
+
+    - to:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 80
+
+    - to:
+        - podSelector:
+            matchLabels:
+              app: database
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    # allow dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-netpol-dev
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+    
+  policyTypes:
+    - Egress
+    - Ingress 
+  
+  ingress: # only backend can reach the db
+
+    - from:
+      - podSelector:
+          matchLabels:
+            app: backend
+          
+      ports:
+        - protocol: TCP
+          port: 5432
+  
+  egress: # no egresses besides dns
+
+    # allow dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-netpol-prod
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      app: database
+    
+  policyTypes:
+    - Egress
+    - Ingress 
+  
+  ingress: # only backend can reach the db
+
+    - from:
+      - podSelector:
+          matchLabels:
+            app: backend
+          
+      ports:
+        - protocol: TCP
+          port: 5432
+  
+  egress: # no egresses besides dns
+
+    # allow dns
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53

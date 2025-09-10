@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-dev
+  labels:
+    env: dev
+    teamname: ecm-dev-team
+  annotations:
+    description: "Development namespace for 5th exercise"
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-prod
+  labels:
+    env: prod
+    teamname: ecm-prod-team
+  annotations:
+    description: "Production namespace for 5th exercise"

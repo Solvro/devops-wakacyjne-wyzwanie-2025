@@ -1,0 +1,54 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev # full access in development
+  name: dev-access
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+    
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-access-binding
+  namespace: ecommerce-dev
+subjects:
+
+  - kind: Group
+    name: dev-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: dev-access
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod # read only for prod 
+  name: prod-ro
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods","pods/log", "services", "configmaps"]
+    verbs: ["get", "watch", "list"]
+    
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prod-ro-binding
+  namespace: ecommerce-prod
+subjects:
+
+  - kind: Group
+    name: dev-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: prod-ro
+  apiGroup: rbac.authorization.k8s.io

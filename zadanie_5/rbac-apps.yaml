@@ -1,0 +1,70 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sa-minimal-role
+  namespace: ecommerce-dev
+rules: 
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sa-minimal-role-binding
+  namespace: ecommerce-dev # guess if I'm specifying namespaces here
+  #there's no need to to that for subj. explicitly
+subjects:
+
+  - kind: ServiceAccount
+    name: dev-back-sa
+
+  - kind: ServiceAccount
+    name: dev-front-sa
+
+  - kind: ServiceAccount
+    name: dev-db-sa
+
+roleRef:
+  kind: Role
+  name: sa-minimal-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sa-minimal-role
+  namespace: ecommerce-prod
+rules: 
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sa-minimal-role-binding
+  namespace: ecommerce-prod
+subjects:
+
+  - kind: ServiceAccount
+    name: prod-back-sa
+
+  - kind: ServiceAccount
+    name: prod-front-sa
+
+  - kind: ServiceAccount
+    name: prod-db-sa
+
+roleRef:
+  kind: Role
+  name: sa-minimal-role
+  apiGroup: rbac.authorization.k8s.io
