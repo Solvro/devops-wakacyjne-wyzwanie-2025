@@ -1,0 +1,12 @@
+namespace: production
+
+replicaCount: 3
+
+service:
+  type: ClusterIP
+
+autoscaling:
+  enabled: true
+
+env: "production"
+secret: "prod-secret"

@@ -1,0 +1,7 @@
+namespace: development
+
+service:
+  type: NodePort
+
+env: "development"
+secret: "dev-secret"
