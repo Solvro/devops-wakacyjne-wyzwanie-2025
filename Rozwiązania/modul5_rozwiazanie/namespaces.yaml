@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-dev
+  labels:
+    environment: development
+    project: ecommerce
+    team: platform
+  annotations:
+    description: "Dev-env dla naszej apki"
+    contact: "dev-team@company.com"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-prod
+  labels:
+    environment: production
+    project: ecommerce
+    team: platform
+  annotations:
+    description: "Prod-env dla naszej apki"
+    contact: "prod-team@company.com"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ecommerce-dev-quota
+  namespace: ecommerce-dev
+spec:
+  hard:
+    pods: "15"
+    services: "8"
+    secrets: "15"
+    configmaps: "15"
+    persistentvolumeclaims: "6"
+    requests.cpu: "3"
+    requests.memory: "6Gi"
+    limits.cpu: "6"
+    limits.memory: "12Gi"
+    requests.storage: "100Gi"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ecommerce-prod-quota
+  namespace: ecommerce-prod
+spec:
+  hard:
+    pods: "10"
+    services: "5"
+    secrets: "10"
+    configmaps: "10"
+    persistentvolumeclaims: "3"
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    requests.storage: "200Gi"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ecommerce-dev-limits
+  namespace: ecommerce-dev
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    max:
+      cpu: "1000m"
+      memory: "2Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ecommerce-prod-limits
+  namespace: ecommerce-prod
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: "300m"
+      memory: "256Mi"
+    defaultRequest:
+      cpu: "200m"
+      memory: "256Mi"
+    max:
+      cpu: "2000m"
+      memory: "4Gi"
+    min:
+      cpu: "100m"
+      memory: "128Mi"

@@ -1,0 +1,81 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: developer-full-access
+  labels:
+    rbac-type: development
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets", "persistentvolumeclaims"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+  verbs: ["*"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources: ["events", "pods/log", "pods/exec", "pods/portforward"]
+  verbs: ["get", "list", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: developer-read-only
+  labels:
+    rbac-type: production-readonly
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["events", "pods/log"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developers-dev-binding
+  namespace: ecommerce-dev
+subjects:
+- kind: User
+  name: john.dev@company.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: jane.dev@company.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: development-team
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-full-access
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developers-prod-binding
+  namespace: ecommerce-prod
+subjects:
+- kind: User
+  name: john.dev@company.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: jane.dev@company.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: development-team
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-read-only
+  apiGroup: rbac.authorization.k8s.io
