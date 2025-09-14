@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-adonis-tasklist
+  labels:
+    app: tasklist
+    tier: adonis
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: adonis
+      tier: adonis
+  template:
+    metadata:
+      labels:
+        app: adonis
+        tier: adonis
+    spec:
+      containers:
+        - name: adonis
+          image: dawidlinek123/todolist:latest
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: DB_USER
+              value: 'postgres'
+            - name: DB_DATABASE
+              value: 'tasklist'
+            - name: DB_PASSWORD
+              value: 'root'
+            - name: PORT
+              value: '8080'
+            - name: HOST
+              value: '0.0.0.0'
+            - name: LOG_LEVEL
+              value: 'info'
+            - name: SESSION_DRIVER
+              value: 'cookie'
+            - name: DB_HOST
+              value: '10.244.0.27'
+            - name: DB_PORT
+              value: '5432'
+            - name: APP_KEY
+              value: '0ynyHgpd0YHVtqXTXDhsSLKSkTDaltB0'
