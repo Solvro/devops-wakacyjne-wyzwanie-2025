@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task List</title>
+  <style>
+    li {
+       margin-bottom: 10px;
+      }
+  </style>
+</head>
+<body>
+  <h1>Task List</h1>
+
+  <form action="{{ route('tasks.store') }}" method="POST">
+    {{ csrfField() }}
+    <input type="text" name="name" placeholder="New Task">
+    <button type="submit">➕</button>
+  </form>
+
+  <ul>
+    @each(task in tasks)
+      <li>
+        <span>
+          {{ task.name }} - Created at: {{ task.createdAt.toFormat('yyyy-MM-dd HH:mm:ss') }} - Done: {{ task.done ? 'Yes' : 'No' }}
+        </span>
+
+        @if(!task.done)
+          <form action="{{ route('tasks.update', { id: task.id }) }}?_method=PATCH" method="POST" style="display: inline;">
+            {{ csrfField() }}
+            <input type="hidden" name="_method" value="PATCH">
+            <button type="submit">✅</button>
+          </form>
+        @endif
+      </li>
+    @end
+  </ul>
+
+</body>
+</html>
