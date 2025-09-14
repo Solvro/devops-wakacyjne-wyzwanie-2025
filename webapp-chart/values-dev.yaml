@@ -1,0 +1,9 @@
+replicaCount: 1
+
+service:
+  type: NodePort
+  nodePort: 30080
+
+config:
+  appMode: "development"
+  logLevel: "debug"

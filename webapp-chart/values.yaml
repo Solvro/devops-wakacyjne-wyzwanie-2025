@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: nginx
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 80
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+config:
+  appMode: "development"
+  logLevel: "debug"
+
+secret:
+  dbUsername: "user"
+  dbPassword: "password123"
