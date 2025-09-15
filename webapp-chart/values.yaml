@@ -1,0 +1,44 @@
+replicaCount: 1
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+config:
+  appMode: "development"
+  logLevel: "debug"
+
+secrets:
+  dbUsername: "admin"
+  dbPassword: "password123"
+  apiKey: "dev-api-key-123"
+
+healthChecks:
+  enabled: true
+  liveness:
+    path: /
+    port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readiness:
+    path: /
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  startup:
+    path: /
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 30

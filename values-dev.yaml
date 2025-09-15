@@ -1,0 +1,18 @@
+replicaCount: 1
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+
+autoscaling:
+  enabled: false
+
+config:
+  appMode: "development"
+  logLevel: "debug"
+
+secrets:
+  dbUsername: "dev-admin"
+  dbPassword: "mojehaslo123"
+  apiKey: "dev-api-key-abcdef"

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webapp.fullname" . }}
+  labels:
+    {{- include "webapp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "webapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "webapp.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: webapp
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "webapp.fullname" . }}-config
+              key: APP_MODE
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "webapp.fullname" . }}-config
+              key: LOG_LEVEL
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "webapp.fullname" . }}-secrets
+              key: DB_USERNAME
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "webapp.fullname" . }}-secrets
+              key: DB_PASSWORD
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "webapp.fullname" . }}-secrets
+              key: API_KEY
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/conf.d
+          readOnly: true
+        - name: secret-volume
+          mountPath: /etc/secrets
+          readOnly: true
+        
+        {{- if .Values.healthChecks.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.healthChecks.liveness.path }}
+            port: {{ .Values.healthChecks.liveness.port }}
+          initialDelaySeconds: {{ .Values.healthChecks.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthChecks.liveness.periodSeconds }}
+        
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthChecks.readiness.path }}
+            port: {{ .Values.healthChecks.readiness.port }}
+          initialDelaySeconds: {{ .Values.healthChecks.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthChecks.readiness.periodSeconds }}
+        
+        startupProbe:
+          httpGet:
+            path: {{ .Values.healthChecks.startup.path }}
+            port: {{ .Values.healthChecks.startup.port }}
+          initialDelaySeconds: {{ .Values.healthChecks.startup.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthChecks.startup.periodSeconds }}
+          failureThreshold: {{ .Values.healthChecks.startup.failureThreshold }}
+        {{- end }}
+
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ include "webapp.fullname" . }}-config
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+      - name: secret-volume
+        secret:
+          secretName: {{ include "webapp.fullname" . }}-secrets
