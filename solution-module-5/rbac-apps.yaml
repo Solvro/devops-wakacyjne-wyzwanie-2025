@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: backend-app-role
+  namespace: ecommerce-dev
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backend-app-binding
+  namespace: ecommerce-dev
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: backend-app-role
+  apiGroup: rbac.authorization.k8s.io
