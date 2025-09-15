@@ -1,0 +1,23 @@
+# Development environment configuration
+replicaCount: 1
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 80
+
+autoscaling:
+  enabled: false
+
+config:
+  DATABASE_URL: "postgresql://postgres:5432/webapp_dev"
+  LOG_LEVEL: "DEBUG"
+  CACHE_TTL: "1800"
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

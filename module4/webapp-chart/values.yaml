@@ -1,0 +1,48 @@
+# Application Config
+app:
+  name: webapp
+  version: 1.0.0
+# Image
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "1.22-alpine"
+# Replicas
+replicaCount: 1
+# Service
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+# Resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 500m
+    memory: 256Mi
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+# ConfigMap
+config:
+  DATABASE_URL: "postgresql://postgres:5432/webapp"
+  LOG_LEVEL: "INFO"
+  CACHE_TTL: "3600"
+# Secrets
+secrets:
+  DATABASE_PASSWORD: "secret123"
+  API_KEY: "sk-1234567890"
