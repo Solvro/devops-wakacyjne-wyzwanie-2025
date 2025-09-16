@@ -1,0 +1,203 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: frontend-app-role
+  labels:
+    rbac-type: app-minimal
+    component: frontend
+    environment: dev
+rules:
+# Minimalne uprawnienia dla aplikacji frontend
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: backend-app-role
+  labels:
+    rbac-type: app-minimal
+    component: backend
+    environment: dev
+rules:
+# Backend potrzebuje odczytu konfiguracji i sekretów
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+# Backend potrzebuje wykrywania serwisów
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+# Backend może potrzebować tworzenia eventów do logowania
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: database-app-role
+  labels:
+    rbac-type: app-minimal
+    component: database
+    environment: dev
+rules:
+# Baza danych potrzebuje tylko odczytu własnej konfiguracji i sekretów
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+# Baza danych może potrzebować tworzenia eventów do logowania
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: frontend-app-role
+  labels:
+    rbac-type: app-minimal
+    component: frontend
+    environment: prod
+rules:
+# Minimalne uprawnienia dla aplikacji frontend
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: backend-app-role
+  labels:
+    rbac-type: app-minimal
+    component: backend
+    environment: prod
+rules:
+# Backend potrzebuje odczytu konfiguracji i sekretów
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+# Backend potrzebuje wykrywania serwisów
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+# Backend może potrzebować tworzenia eventów do logowania
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: database-app-role
+  labels:
+    rbac-type: app-minimal
+    component: database
+    environment: prod
+rules:
+# Baza danych potrzebuje tylko odczytu własnej konfiguracji i sekretów
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+# Baza danych może potrzebować tworzenia eventów do logowania
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-app-binding
+  namespace: ecommerce-dev
+subjects:
+- kind: ServiceAccount
+  name: frontend-sa
+  namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backend-app-binding
+  namespace: ecommerce-dev
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: database-app-binding
+  namespace: ecommerce-dev
+subjects:
+- kind: ServiceAccount
+  name: database-sa
+  namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: database-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: frontend-app-binding
+  namespace: ecommerce-prod
+subjects:
+- kind: ServiceAccount
+  name: frontend-sa
+  namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: backend-app-binding
+  namespace: ecommerce-prod
+subjects:
+- kind: ServiceAccount
+  name: backend-sa
+  namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: database-app-binding
+  namespace: ecommerce-prod
+subjects:
+- kind: ServiceAccount
+  name: database-sa
+  namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: database-app-role
+  apiGroup: rbac.authorization.k8s.io

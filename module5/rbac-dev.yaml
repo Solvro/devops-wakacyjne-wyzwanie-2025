@@ -1,0 +1,99 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: developer-full-access
+  labels:
+    rbac-type: developer-full
+    environment: dev
+rules:
+# Pełny dostęp do wszystkich zasobów w namespace dev
+- apiGroups: [""]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["extensions"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["batch"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: developer-read-only
+  labels:
+    rbac-type: developer-readonly
+    environment: prod
+rules:
+# Dostęp tylko do odczytu podów i serwisów
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+# Dostęp tylko do odczytu logów podów
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+# Dostęp tylko do odczytu deploymentów i replicasetów
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "daemonsets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+# Dostęp tylko do odczytu ingressów
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["get", "list", "watch"]
+# Dostęp tylko do odczytu jobów i cronjobów
+- apiGroups: ["batch"]
+  resources: ["jobs", "cronjobs"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-full-access-binding
+  namespace: ecommerce-dev
+subjects:
+# Użytkownicy deweloperzy
+- kind: User
+  name: john.developer@ecommerce.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: jane.developer@ecommerce.com
+  apiGroup: rbac.authorization.k8s.io
+# Grupa deweloperów
+- kind: Group
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-full-access
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-read-only-binding
+  namespace: ecommerce-prod
+subjects:
+# Użytkownicy deweloperzy
+- kind: User
+  name: john.developer@ecommerce.com
+  apiGroup: rbac.authorization.k8s.io
+- kind: User
+  name: jane.developer@ecommerce.com
+  apiGroup: rbac.authorization.k8s.io
+# Grupa deweloperów
+- kind: Group
+  name: developers
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-read-only
+  apiGroup: rbac.authorization.k8s.io

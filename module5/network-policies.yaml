@@ -1,0 +1,339 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-netpol
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      component: frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Zezwól na ruch z kontrolera ingress
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  
+  # Zezwól na ruch z monitoringu
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  egress:
+  # Zezwól na komunikację z backendem
+  - to:
+    - podSelector:
+        matchLabels:
+          component: backend
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Zezwól na zapytania DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      component: backend
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Tylko frontend może komunikować się z backendem
+  - from:
+    - podSelector:
+        matchLabels:
+          component: frontend
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Zezwól na monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  egress:
+  # Zezwól na komunikację z bazą danych
+  - to:
+    - podSelector:
+        matchLabels:
+          component: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Zezwól na komunikację z powrotem do frontendu
+  - to:
+    - podSelector:
+        matchLabels:
+          component: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+  
+  # Zezwól na zapytania DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-netpol
+  namespace: ecommerce-dev
+spec:
+  podSelector:
+    matchLabels:
+      component: database
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Tylko backend może komunikować się z bazą danych
+  - from:
+    - podSelector:
+        matchLabels:
+          component: backend
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Zezwól systemowi backup
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: backup-system
+    - podSelector:
+        matchLabels:
+          app: backup-agent
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  egress:
+  # Tylko zapytania DNS (brak ruchu wychodzącego poza DNS)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-netpol
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      component: frontend
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Zezwól na ruch z kontrolera ingress
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+  
+  # Zezwól na ruch z monitoringu
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  egress:
+  # Zezwól na komunikację z backendem
+  - to:
+    - podSelector:
+        matchLabels:
+          component: backend
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Zezwól na zapytania DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      component: backend
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Tylko frontend może komunikować się z backendem
+  - from:
+    - podSelector:
+        matchLabels:
+          component: frontend
+    ports:
+    - protocol: TCP
+      port: 8080
+  
+  # Zezwól na monitoring
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+
+  egress:
+  # Zezwól na komunikację z bazą danych
+  - to:
+    - podSelector:
+        matchLabels:
+          component: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Zezwól na komunikację z powrotem do frontendu
+  - to:
+    - podSelector:
+        matchLabels:
+          component: frontend
+    ports:
+    - protocol: TCP
+      port: 80
+  
+  # Zezwól na zapytania DNS
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-netpol
+  namespace: ecommerce-prod
+spec:
+  podSelector:
+    matchLabels:
+      component: database
+  policyTypes:
+  - Ingress
+  - Egress
+  
+  ingress:
+  # Tylko backend może komunikować się z bazą danych
+  - from:
+    - podSelector:
+        matchLabels:
+          component: backend
+    ports:
+    - protocol: TCP
+      port: 5432
+  
+  # Zezwól systemowi backup
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: backup-system
+    - podSelector:
+        matchLabels:
+          app: backup-agent
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  egress:
+  # Tylko zapytania DNS (brak ruchu wychodzącego poza DNS)
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
