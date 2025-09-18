@@ -1,0 +1,61 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: developer-full
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["apps","batch","extensions"]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+# Developers are set to read-only in prod ns
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: developer-readonly
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods","pods/log","services","endpoints","configmaps","secrets","persistentvolumeclaims","deployments","replicasets","statefulsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets"]
+    verbs: ["get", "list", "watch"]
+---
+# RoleBinding in dev to dev role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devs-binding-full
+  namespace: ecommerce-dev
+subjects:
+  - kind: Group
+#  - kind: User
+    name: devs
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-full
+  apiGroup: rbac.authorization.k8s.io
+---
+# RoleBinding in prod to prod role (read-only)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devs-binding-readonly
+  namespace: ecommerce-prod
+subjects:
+  - kind: Group
+  #- kind: User
+    name: devs
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer-readonly
+  apiGroup: rbac.authorization.k8s.io
