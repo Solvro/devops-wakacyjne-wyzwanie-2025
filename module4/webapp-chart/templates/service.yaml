@@ -1,0 +1,47 @@
+{{- if .Values.backend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "budzetownik-chart.backend.serviceName" . }}
+  labels:
+    {{- include "budzetownik-chart.backend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+    - port: {{ .Values.backend.service.port }}
+      targetPort: {{ .Values.backend.service.name }}
+      protocol: TCP
+      name: {{ .Values.backend.service.name }}
+      {{- if and (eq .Values.backend.service.type "NodePort") .Values.backend.service.nodePort }}
+      nodePort: {{ .Values.backend.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "budzetownik-chart.backend.selectorLabels" . | nindent 4 }}
+  {{- if eq .Values.backend.service.type "NodePort" }}
+  externalTrafficPolicy: Cluster
+  {{- end }}
+{{- end }}
+---
+{{- if .Values.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "budzetownik-chart.frontend.serviceName" . }}
+  labels:
+    {{- include "budzetownik-chart.frontend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+      targetPort: {{ .Values.frontend.service.targetPort }}
+      protocol: TCP
+      name: http
+      {{- if and (eq .Values.frontend.service.type "NodePort") .Values.frontend.service.nodePort }}
+      nodePort: {{ .Values.frontend.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "budzetownik-chart.frontend.selectorLabels" . | nindent 4 }}
+  {{- if eq .Values.frontend.service.type "NodePort" }}
+  externalTrafficPolicy: Cluster
+  {{- end }}
+{{- end }}

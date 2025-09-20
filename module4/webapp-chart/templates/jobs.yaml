@@ -1,0 +1,74 @@
+{{- if and .Values.databaseJobs.migrate.enabled .Values.backend.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "budzetownik-chart.fullname" . }}-prisma-migrate
+  labels:
+    {{- include "budzetownik-chart.labels" . | nindent 4 }}
+    component: migration
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "budzetownik-chart.selectorLabels" . | nindent 8 }}
+        component: migration
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.databaseJobs.migrate.restartPolicy }}
+      containers:
+        - name: prisma-migrate
+          image: "{{ .Values.global.imageRegistry }}{{ .Values.databaseJobs.migrate.image.repository }}:{{ .Values.databaseJobs.migrate.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.databaseJobs.migrate.image.pullPolicy }}
+          command: ['npx', 'prisma', 'migrate', 'deploy']
+          env:
+            - name: DATABASE_URL
+              value: {{ include "budzetownik-chart.databaseUrl" . | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ include "budzetownik-chart.fullname" . }}-postgresql-secret
+  backoffLimit: {{ .Values.databaseJobs.migrate.backoffLimit }}
+{{- end }}
+---
+{{- if and .Values.databaseJobs.seed.enabled .Values.backend.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "budzetownik-chart.fullname" . }}-prisma-seed
+  labels:
+    {{- include "budzetownik-chart.labels" . | nindent 4 }}
+    component: seeding
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "budzetownik-chart.selectorLabels" . | nindent 8 }}
+        component: seeding
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: {{ .Values.databaseJobs.seed.restartPolicy }}
+      containers:
+        - name: prisma-seed
+          image: "{{ .Values.global.imageRegistry }}{{ .Values.databaseJobs.seed.image.repository }}:{{ .Values.databaseJobs.seed.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.databaseJobs.seed.image.pullPolicy }}
+          env:
+            - name: DATABASE_URL
+              value: {{ include "budzetownik-chart.databaseUrl" . | quote }}
+          envFrom:
+            - secretRef:
+                name: {{ include "budzetownik-chart.fullname" . }}-postgresql-secret
+  backoffLimit: {{ .Values.databaseJobs.seed.backoffLimit }}
+{{- end }}

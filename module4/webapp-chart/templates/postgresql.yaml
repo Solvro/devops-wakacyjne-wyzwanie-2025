@@ -1,0 +1,84 @@
+{{- if and (not .Values.database.postgresql.enabled) .Values.database.custom.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "budzetownik-chart.fullname" . }}-postgresql-pvc
+  labels:
+    {{- include "budzetownik-chart.database.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.database.custom.persistence.size }}
+  {{- if .Values.database.custom.persistence.storageClass }}
+  storageClassName: {{ .Values.database.custom.persistence.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "budzetownik-chart.postgresql.serviceName" . }}
+  labels:
+    {{- include "budzetownik-chart.database.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "budzetownik-chart.database.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: 5432
+      targetPort: postgresql
+      protocol: TCP
+      name: postgresql
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "budzetownik-chart.fullname" . }}-postgresql
+  labels:
+    {{- include "budzetownik-chart.database.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "budzetownik-chart.postgresql.serviceName" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "budzetownik-chart.database.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "budzetownik-chart.database.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: postgresql
+          image: "{{ .Values.database.custom.image.repository }}:{{ .Values.database.custom.image.tag }}"
+          imagePullPolicy: {{ .Values.database.custom.image.pullPolicy }}
+          ports:
+            - containerPort: 5432
+              name: postgresql
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.app.name | quote }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "budzetownik-chart.fullname" . }}-postgresql-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "budzetownik-chart.fullname" . }}-postgresql-secret
+                  key: POSTGRES_PASSWORD
+          resources:
+            {{- toYaml .Values.database.custom.resources | nindent 12 }}
+          {{- if .Values.database.custom.persistence.enabled }}
+          volumeMounts:
+            - name: postgresql-data
+              mountPath: /var/lib/postgresql/data
+          {{- end }}
+      {{- if .Values.database.custom.persistence.enabled }}
+      volumes:
+        - name: postgresql-data
+          persistentVolumeClaim:
+            claimName: {{ include "budzetownik-chart.fullname" . }}-postgresql-pvc
+      {{- end }}
+{{- end }}
