@@ -1,8 +1,5 @@
-# Patterns to ignore when building packages.
-# This supports shell glob matching, relative path matching, and
-# negation (prefixed with !). Only one pattern per line.
 .DS_Store
-# Common VCS dirs
+
 .git/
 .gitignore
 .bzr/
@@ -10,18 +7,18 @@
 .hg/
 .hgignore
 .svn/
-# Common backup files
+
 *.swp
 *.bak
 *.tmp
 *.orig
 *~
-# Various IDEs
+
 .project
 .idea/
 *.tmproj
 .vscode/
-# OS generated files
+
 .DS_Store
 .DS_Store?
 ._*
@@ -29,9 +26,9 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-# Helm specific
+
 .helmignore
-# Development files
+
 *.md
 README.md
 NOTES.md
