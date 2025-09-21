@@ -134,15 +134,17 @@ autoscaling:
     enabled: true
     minReplicas: 2
     maxReplicas: 4
-    targetCPUUtilizationPercentage: 70
+    targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'webapp-prod-webapp-chart-backend'
 
   frontend:
     enabled: true
     minReplicas: 2
     maxReplicas: 4
-    targetCPUUtilizationPercentage: 70
+    targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'webapp-prod-webapp-chart-frontend'
 
 podSecurityContext: {}
 

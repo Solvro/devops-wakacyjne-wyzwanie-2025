@@ -202,16 +202,18 @@ autoscaling:
   backend:
     enabled: false
     minReplicas: 2
-    maxReplicas: 10
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'webapp-prod-webapp-chart-backend'
 
   frontend:
     enabled: false
     minReplicas: 2
-    maxReplicas: 10
+    maxReplicas: 4
     targetCPUUtilizationPercentage: 80
     targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'webapp-prod-webapp-chart-frontend'
 
 serviceAccount:
   create: true
