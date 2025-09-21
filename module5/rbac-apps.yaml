@@ -1,0 +1,312 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: ecommerce-frontend-app-role
+  labels:
+    app: ecommerce
+    tier: frontend
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+    resourceNames: []
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: ecommerce-backend-app-role
+  labels:
+    app: ecommerce
+    tier: backend
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['ecommerce-backend-secret', 'database-credentials']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create', 'patch']
+
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'patch']
+    resourceNames: ['ecommerce-backend']
+
+  - apiGroups: ['batch']
+    resources: ['jobs']
+    verbs: ['get', 'list', 'watch', 'create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: ecommerce-database-app-role
+  labels:
+    app: ecommerce
+    tier: database
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['database-credentials', 'postgres-secret']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: ecommerce-frontend-app-role
+  labels:
+    app: ecommerce
+    tier: frontend
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: ecommerce-backend-app-role
+  labels:
+    app: ecommerce
+    tier: backend
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['ecommerce-backend-secret', 'database-credentials']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get']
+    resourceNames: ['ecommerce-backend']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: ecommerce-database-app-role
+  labels:
+    app: ecommerce
+    tier: database
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['database-credentials', 'postgres-secret']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-frontend-app-binding
+  namespace: ecommerce-dev
+  labels:
+    app: ecommerce
+    tier: frontend
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-frontend-sa
+    namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: ecommerce-frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-backend-app-binding
+  namespace: ecommerce-dev
+  labels:
+    app: ecommerce
+    tier: backend
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-backend-sa
+    namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: ecommerce-backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-database-app-binding
+  namespace: ecommerce-dev
+  labels:
+    app: ecommerce
+    tier: database
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-database-sa
+    namespace: ecommerce-dev
+roleRef:
+  kind: Role
+  name: ecommerce-database-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-frontend-app-binding
+  namespace: ecommerce-prod
+  labels:
+    app: ecommerce
+    tier: frontend
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-frontend-sa
+    namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: ecommerce-frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-backend-app-binding
+  namespace: ecommerce-prod
+  labels:
+    app: ecommerce
+    tier: backend
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-backend-sa
+    namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: ecommerce-backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-database-app-binding
+  namespace: ecommerce-prod
+  labels:
+    app: ecommerce
+    tier: database
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: ecommerce-database-sa
+    namespace: ecommerce-prod
+roleRef:
+  kind: Role
+  name: ecommerce-database-app-role
+  apiGroup: rbac.authorization.k8s.io

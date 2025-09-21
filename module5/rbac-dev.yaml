@@ -1,0 +1,141 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: ecommerce-dev-full-access
+  labels:
+    app: ecommerce
+    rbac-type: full-access
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources:
+      [
+        'pods',
+        'services',
+        'configmaps',
+        'secrets',
+        'persistentvolumeclaims',
+        'endpoints',
+      ]
+    verbs: ['*']
+
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'statefulsets', 'daemonsets']
+    verbs: ['*']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses', 'networkpolicies']
+    verbs: ['*']
+
+  - apiGroups: ['autoscaling']
+    resources: ['horizontalpodautoscalers']
+    verbs: ['*']
+
+  - apiGroups: ['batch']
+    resources: ['jobs', 'cronjobs']
+    verbs: ['*']
+
+  - apiGroups: ['']
+    resources: ['pods/log', 'pods/exec', 'pods/portforward', 'pods/attach']
+    verbs: ['get', 'list', 'create']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['pods', 'nodes']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: ecommerce-prod-read-only
+  labels:
+    app: ecommerce
+    rbac-type: read-only
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources:
+      ['pods', 'services', 'configmaps', 'endpoints', 'persistentvolumeclaims']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'statefulsets', 'daemonsets']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses', 'networkpolicies']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['autoscaling']
+    resources: ['horizontalpodautoscalers']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['batch']
+    resources: ['jobs', 'cronjobs']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['pods/log']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['pods', 'nodes']
+    verbs: ['get', 'list']
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-developers-dev-binding
+  namespace: ecommerce-dev
+  labels:
+    app: ecommerce
+    environment: dev
+subjects:
+  - kind: User
+    name: wsparcie@ecommerce.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: ecommerce-developers
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: ServiceAccount
+    name: dev-ci-sa
+    namespace: ecommerce-dev
+
+roleRef:
+  kind: Role
+  name: ecommerce-dev-full-access
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-developers-prod-binding
+  namespace: ecommerce-prod
+  labels:
+    app: ecommerce
+    environment: prod
+subjects:
+  - kind: User
+    name: wsparcie@ecommerce.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: ecommerce-developers
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: ecommerce-prod-read-only
+  apiGroup: rbac.authorization.k8s.io

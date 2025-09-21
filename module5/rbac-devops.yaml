@@ -1,0 +1,169 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ecommerce-devops-cluster-admin
+  labels:
+    app: ecommerce
+    rbac-type: devops-admin
+rules:
+  - apiGroups: ['']
+    resources: ['nodes', 'persistentvolumes', 'namespaces']
+    verbs: ['*']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingressclasses', 'networkpolicies']
+    verbs: ['*']
+
+  - apiGroups: ['storage.k8s.io']
+    resources: ['storageclasses', 'volumeattachments']
+    verbs: ['*']
+
+  - apiGroups: ['rbac.authorization.k8s.io']
+    resources: ['clusterroles', 'clusterrolebindings', 'roles', 'rolebindings']
+    verbs: ['*']
+
+  - apiGroups: ['apiextensions.k8s.io']
+    resources: ['customresourcedefinitions']
+    verbs: ['*']
+
+  - apiGroups: ['admissionregistration.k8s.io']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['autoscaling']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['policy']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-dev
+  name: ecommerce-devops-dev-admin
+  labels:
+    app: ecommerce
+    rbac-type: devops-admin
+    environment: dev
+rules:
+  - apiGroups: ['*']
+    resources: ['*']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: ecommerce-prod
+  name: ecommerce-devops-prod-admin
+  labels:
+    app: ecommerce
+    rbac-type: devops-admin
+    environment: prod
+rules:
+  - apiGroups: ['*']
+    resources: ['*']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ecommerce-devops-cluster-binding
+  labels:
+    app: ecommerce
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@ecommerce.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: ecommerce-devops
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: ServiceAccount
+    name: devops-automation-sa
+    namespace: kube-system
+
+roleRef:
+  kind: ClusterRole
+  name: ecommerce-devops-cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-devops-dev-binding
+  namespace: ecommerce-dev
+  labels:
+    app: ecommerce
+    environment: dev
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@ecommerce.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: ecommerce-devops
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: ecommerce-devops-dev-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ecommerce-devops-prod-binding
+  namespace: ecommerce-prod
+  labels:
+    app: ecommerce
+    environment: prod
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@ecommerce.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: ecommerce-devops
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: ecommerce-devops-prod-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: devops-automation-sa
+  namespace: kube-system
+  labels:
+    app: ecommerce
+    component: devops-automation
+  annotations:
+    description: 'Service account for DevOps automation tasks'
+    contact: 'wsparcie@ecommerce.com'
+automountServiceAccountToken: true
