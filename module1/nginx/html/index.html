@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f8f8f8;
+        color: #333;
+      }
+
+      .gallery-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f5f5f5;
+      }
+
+      .artwork-display {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        position: relative;
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.05);
+      }
+
+      .artwork-display::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.1) 0%,
+          transparent 100%
+        );
+        pointer-events: none;
+      }
+
+      .artwork-display img {
+        max-width: 80%;
+        max-height: 70vh;
+        object-fit: contain;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2),
+          0 40px 60px rgba(0, 0, 0, 0.15),
+          0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        transform: perspective(1000px) rotateX(0.5deg);
+        filter: drop-shadow(0 15px 10px rgba(0, 0, 0, 0.1));
+      }
+
+      .exhibition-info {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #888;
+        border-top: 1px solid #e0e0e0;
+        background-color: white;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.03);
+      }
+
+      .gallery-label {
+        text-align: left;
+      }
+
+      .time-display {
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .exhibition-title {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        font-size: 12px;
+        color: #aaa;
+        text-orientation: mixed;
+        letter-spacing: 2px;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gallery-container">
+      <div class="artwork-display">
+        <img
+          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%2Fid%2FOIP.KWPYPw368VTYaHQURxmrZAHaG7%3Fpid%3DApi&f=1&ipt=81f3a510ddf95fe4c3f7fc3880e126202c261a96eca8ef489544159a1ed9ab54"
+          alt="Contemporary Artwork"
+        />
+        <div class="exhibition-title">
+          UNKNOWN ARTIST<br />OIP-814330212<br />2025
+        </div>
+      </div>
+      <div class="exhibition-info">
+        <div class="gallery-label"><strong>GALLERY</strong></div>
+        <div class="time-display" id="current-time"></div>
+      </div>
+    </div>
+
+    <script>
+      function updateTime() {
+        const timeElement = document.getElementById('current-time')
+        const now = new Date()
+
+        const hours = now.getHours().toString().padStart(2, '0')
+        const minutes = now.getMinutes().toString().padStart(2, '0')
+        const seconds = now.getSeconds().toString().padStart(2, '0')
+        const timeString = `${hours}:${minutes}:${seconds}`
+
+        timeElement.textContent = timeString
+      }
+
+      updateTime()
+      setInterval(updateTime, 1000)
+    </script>
+  </body>
+</html>
