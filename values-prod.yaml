@@ -1,0 +1,20 @@
+replicaCount: 3
+
+service:
+  type: ClusterIP
+  port: 80
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+config:
+  appMode: "production"
+  logLevel: "info"
+
+secrets:
+  dbUsername: "prod-admin"
+  dbPassword: "mojehaslo123"
+  apiKey: "prod-api-key-ghijklmnop"
