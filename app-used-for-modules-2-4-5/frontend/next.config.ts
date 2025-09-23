@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   env: {
     NEXT_PUBLIC_API_URL:
-      process.env.NEXT_PUBLIC_API_URL || 'http://budzetownik-dev.local/api',
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001',
   },
   async headers() {
     return [
@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; connect-src 'self' http://budzetownik-dev.local https:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:",
+              "default-src 'self'; connect-src 'self' http://localhost:5001 http://budzetownik-dev.local https:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:",
           },
         ],
       },

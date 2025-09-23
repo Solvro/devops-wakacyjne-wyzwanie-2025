@@ -110,14 +110,6 @@ export default function Dashboard() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {user?.username}!
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Here&apos;s what&apos;s happening with your trips and expenses
-          </p>
-        </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <div className="mb-6">
@@ -202,7 +194,7 @@ export default function Dashboard() {
                       <label className="text-xs text-gray-500 uppercase">
                         Budget Left
                       </label>
-                      <div className="text-sm">${tripStats.budgetLeft}</div>
+                      <div className="text-sm">{tripStats.budgetLeft} PLN</div>
                     </div>
                     <div className="grid grid-cols-2">
                       <label className="text-xs text-gray-500 uppercase">
@@ -231,7 +223,7 @@ export default function Dashboard() {
                         new Date(a.startDate!).getTime() -
                         new Date(b.startDate!).getTime()
                     )
-                    .slice(0, 3)
+                    .slice(0, 2)
                     .map((activity: Activity) => (
                       <div
                         key={activity.id}
@@ -274,6 +266,15 @@ export default function Dashboard() {
                       {recommendations?.nextPlace || 'No recommendation'}
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-2">
+                    <label className="text-xs text-gray-500 uppercase">
+                      Next Food
+                    </label>
+                    <div className="text-sm mt-1">
+                      {recommendations?.nextPlace || 'No recommendation'}
+                    </div>
+                  </div>
                   <div className="grid grid-cols-2">
                     <label className="text-xs text-gray-500 uppercase">
                       Next Event
@@ -293,8 +294,8 @@ export default function Dashboard() {
                   RECENT EXPENSES
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 max-h-18 overflow-y-auto">
-                {expensesData.slice(0, 5).map((expense: Expense) => (
+              <CardContent className="space-y-3 max-h-256 overflow-y-auto">
+                {expensesData.slice(0, 6).map((expense: Expense) => (
                   <div
                     key={expense.id}
                     className="border rounded-lg p-3 bg-white"
