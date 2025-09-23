@@ -1,3 +1,6 @@
+global:
+  environment: development
+
 backend:
   replicaCount: 1
 
@@ -11,32 +14,34 @@ backend:
 
   env:
     NODE_ENV: development
+    LOG_LEVEL: debug
 
   resources:
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 100m
+      memory: 256Mi
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 300m
+      memory: 512Mi
+
   healthChecks:
     enabled: true
     livenessProbe:
       httpGet:
         path: /wakacyjne/health
         port: http
-      initialDelaySeconds: 120
-      periodSeconds: 60
-      timeoutSeconds: 30
-      failureThreshold: 10
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 5
     readinessProbe:
       httpGet:
         path: /wakacyjne/health
         port: http
-      initialDelaySeconds: 60
-      periodSeconds: 30
-      timeoutSeconds: 15
-      failureThreshold: 10
+      initialDelaySeconds: 30
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 5
 
 frontend:
   replicaCount: 1
@@ -75,11 +80,11 @@ frontend:
 
   resources:
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 100m
+      memory: 256Mi
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 300m
+      memory: 512Mi
 
 database:
   postgresql:
@@ -93,27 +98,30 @@ database:
       size: 1Gi
     resources:
       requests:
-        cpu: 250m
-        memory: 512Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        cpu: 500m
-        memory: 1Gi
+        cpu: 300m
+        memory: 512Mi
 
 databaseJobs:
   migrate:
-    enabled: false
+    enabled: true
     image:
       tag: 'dev'
   seed:
-    enabled: false
+    enabled: true
     image:
       repository: budzetownik-seeder
       tag: 'dev'
 
 secrets:
   postgresql:
-    POSTGRES_USER: ZGV2X3VzZXI=
-    POSTGRES_PASSWORD: ZGV2X3Bhc3N3b3Jk
+    existingSecret: 'postgres-dev-credentials'
+    userKey: 'username-dev'
+    passwordKey: 'password-dev'
+    POSTGRES_USER: ''
+    POSTGRES_PASSWORD: ''
 
 ingress:
   enabled: true

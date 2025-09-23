@@ -120,9 +120,12 @@ database:
   postgresql:
     enabled: false
     auth:
-      postgresPassword: 'budzetownik_password'
-      username: 'budzetownik_user'
-      password: 'budzetownik_password'
+      existingSecret: 'postgres-credentials'
+      userKey: 'username'
+      passwordKey: 'password'
+      postgresPassword: ''
+      username: ''
+      password: ''
       database: 'budzetownik'
     primary:
       persistence:
@@ -178,8 +181,11 @@ databaseJobs:
 
 secrets:
   postgresql:
-    POSTGRES_USER: YnVkemV0b3duaWtfdXNlcg== # budzetownik_user
-    POSTGRES_PASSWORD: YnVkemV0b3duaWtfcGFzc3dvcmQ= # budzetownik_password
+    existingSecret: 'postgres-credentials'
+    userKey: 'username'
+    passwordKey: 'password'
+    POSTGRES_USER: ''
+    POSTGRES_PASSWORD: ''
 
 config: {}
 

@@ -99,7 +99,7 @@ async function main() {
         role: ParticipantRole.ORGANIZER,
         name: "wsparcie",
         surname: "dev",
-        email: "kamil.sztabert@gmail.com",
+        email: "your.email@gmail.com",
         sex: ParticipantSex.MALE,
       },
     }),

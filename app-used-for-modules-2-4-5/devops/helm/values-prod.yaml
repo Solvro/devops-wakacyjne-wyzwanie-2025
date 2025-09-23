@@ -1,5 +1,8 @@
+global:
+  environment: production
+
 backend:
-  replicaCount: 2
+  replicaCount: 3
 
   image:
     tag: 'prod'
@@ -10,13 +13,14 @@ backend:
 
   env:
     NODE_ENV: production
+    LOG_LEVEL: warn
 
   resources:
     requests:
-      cpu: 250m
+      cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 500m
+      cpu: 1000m
       memory: 1Gi
 
   healthChecks:
@@ -39,7 +43,7 @@ backend:
       failureThreshold: 3
 
 frontend:
-  replicaCount: 2
+  replicaCount: 3
 
   image:
     tag: 'prod'
@@ -51,14 +55,14 @@ frontend:
 
   env:
     NODE_ENV: production
-    NEXT_PUBLIC_API_URL: http://budzetownik-prod.local/api
+    NEXT_PUBLIC_API_URL: https://api.budzetownik.com
 
   resources:
     requests:
-      cpu: 250m
+      cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 500m
+      cpu: 800m
       memory: 1Gi
 
   healthChecks:
@@ -90,36 +94,42 @@ database:
       tag: '13'
     persistence:
       enabled: true
-      size: 2Gi
+      size: 10Gi
     resources:
       requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
+        cpu: 500m
         memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
 
 databaseJobs:
   migrate:
-    enabled: false
+    enabled: true
     image:
       tag: 'prod'
   seed:
     enabled: false
-    image:
-      tag: 'prod'
 
 secrets:
   postgresql:
-    POSTGRES_USER: YnVkemV0b3duaWtfcHJvZF91c2Vy # budzetownik_prod_user
-    POSTGRES_PASSWORD: YnVkemV0b3duaWtfcHJvZF9wYXNzd29yZAo= # budzetownik_prod_password
+    existingSecret: 'postgres-prod-credentials'
+    userKey: 'username-prod'
+    passwordKey: 'password-prod'
+    POSTGRES_USER: ''
+    POSTGRES_PASSWORD: ''
 
 ingress:
   enabled: true
   className: 'nginx'
-  annotations: {}
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/ssl-protocols: 'TLSv1.2 TLSv1.3'
+    nginx.ingress.kubernetes.io/rate-limit-connections: '10'
+    nginx.ingress.kubernetes.io/rate-limit-requests-per-second: '20'
+    nginx.ingress.kubernetes.io/add-headers: 'budzetownik-prod/security-headers'
   hosts:
-    - host: budzetownik-prod.local
+    - host: budzetownik.com
       paths:
         - path: /
           pathType: Prefix
@@ -127,28 +137,39 @@ ingress:
         - path: /api
           pathType: Prefix
           service: backend
-  tls: []
+  tls:
+    - secretName: budzetownik-tls
+      hosts:
+        - budzetownik.com
 
 autoscaling:
   backend:
-    enabled: false
-    minReplicas: 2
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
-    targetDeployment: 'budzetownik-prod-budzetownik-chart-backend'
 
   frontend:
-    enabled: false
-    minReplicas: 2
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 80
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 15
+    targetCPUUtilizationPercentage: 70
     targetMemoryUtilizationPercentage: 80
-    targetDeployment: 'budzetownik-prod-budzetownik-chart-frontend'
 
-podSecurityContext: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
 
-securityContext: {}
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
 
 networkPolicy:
-  enabled: false
+  enabled: true
