@@ -144,7 +144,7 @@ kubectl apply -f frontend/
 
 ## Database Schema
 
-The application uses PostgreSQL with the following main entities:
+[PostgreSQL Diagram on drawSQL](https://drawsql.app/teams/wsparcie/diagrams/budzetownik/embed):
 
 - **Users**: Authentication and user management
 - **Trips**: Main trip entities with categories and budgets
