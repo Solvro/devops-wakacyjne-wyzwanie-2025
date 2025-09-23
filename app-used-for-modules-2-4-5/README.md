@@ -1,7 +1,9 @@
-![EXPEARTI](expearti_white.png)
-
-# ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ your trips budget manager
-
+<div align="center">
+  <img src="expearti_white.png" alt="EXPEARTI">
+</div>
+<div align="center">
+  <h1>your trips budget manager</h1>
+</div>
 The full-stack application for managing vacation budgets, trip expenses, and participant coordination. Built with NestJS backend, Next.js frontend, and Kubernetes-ready deployment infrastructure.
 
 ![Dashboard](budzetownik.png)
