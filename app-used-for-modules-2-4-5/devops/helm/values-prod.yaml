@@ -1,0 +1,154 @@
+backend:
+  replicaCount: 2
+
+  image:
+    tag: 'prod'
+
+  service:
+    type: ClusterIP
+    port: 5001
+
+  env:
+    NODE_ENV: production
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+frontend:
+  replicaCount: 2
+
+  image:
+    tag: 'prod'
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5002
+
+  env:
+    NODE_ENV: production
+    NEXT_PUBLIC_API_URL: http://budzetownik-prod.local/api
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 30
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+database:
+  postgresql:
+    enabled: false
+  custom:
+    enabled: true
+    image:
+      repository: postgres
+      tag: '13'
+    persistence:
+      enabled: true
+      size: 2Gi
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+
+databaseJobs:
+  migrate:
+    enabled: false
+    image:
+      tag: 'prod'
+  seed:
+    enabled: false
+    image:
+      tag: 'prod'
+
+secrets:
+  postgresql:
+    POSTGRES_USER: YnVkemV0b3duaWtfcHJvZF91c2Vy # budzetownik_prod_user
+    POSTGRES_PASSWORD: YnVkemV0b3duaWtfcHJvZF9wYXNzd29yZAo= # budzetownik_prod_password
+
+ingress:
+  enabled: true
+  className: 'nginx'
+  annotations: {}
+  hosts:
+    - host: budzetownik-prod.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls: []
+
+autoscaling:
+  backend:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'budzetownik-prod-budzetownik-chart-backend'
+
+  frontend:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'budzetownik-prod-budzetownik-chart-frontend'
+
+podSecurityContext: {}
+
+securityContext: {}
+
+networkPolicy:
+  enabled: false

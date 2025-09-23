@@ -1,0 +1,169 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: budzetownik-devops-cluster-admin
+  labels:
+    app: budzetownik
+    rbac-type: devops-admin
+rules:
+  - apiGroups: ['']
+    resources: ['nodes', 'persistentvolumes', 'namespaces']
+    verbs: ['*']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingressclasses', 'networkpolicies']
+    verbs: ['*']
+
+  - apiGroups: ['storage.k8s.io']
+    resources: ['storageclasses', 'volumeattachments']
+    verbs: ['*']
+
+  - apiGroups: ['rbac.authorization.k8s.io']
+    resources: ['clusterroles', 'clusterrolebindings', 'roles', 'rolebindings']
+    verbs: ['*']
+
+  - apiGroups: ['apiextensions.k8s.io']
+    resources: ['customresourcedefinitions']
+    verbs: ['*']
+
+  - apiGroups: ['admissionregistration.k8s.io']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['autoscaling']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['policy']
+    resources: ['*']
+    verbs: ['*']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-dev
+  name: budzetownik-devops-dev-admin
+  labels:
+    app: budzetownik
+    rbac-type: devops-admin
+    environment: dev
+rules:
+  - apiGroups: ['*']
+    resources: ['*']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-prod
+  name: budzetownik-devops-prod-admin
+  labels:
+    app: budzetownik
+    rbac-type: devops-admin
+    environment: prod
+rules:
+  - apiGroups: ['*']
+    resources: ['*']
+    verbs: ['*']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: budzetownik-devops-cluster-binding
+  labels:
+    app: budzetownik
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@budzetownik.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: budzetownik-devops
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: ServiceAccount
+    name: devops-automation-sa
+    namespace: kube-system
+
+roleRef:
+  kind: ClusterRole
+  name: budzetownik-devops-cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-devops-dev-binding
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    environment: dev
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@budzetownik.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: budzetownik-devops
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: budzetownik-devops-dev-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-devops-prod-binding
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    environment: prod
+    rbac-type: devops-admin
+subjects:
+  - kind: User
+    name: wsparcie@budzetownik.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: budzetownik-devops
+    apiGroup: rbac.authorization.k8s.io
+  - kind: Group
+    name: platform-team
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: budzetownik-devops-prod-admin
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: devops-automation-sa
+  namespace: kube-system
+  labels:
+    app: budzetownik
+    component: devops-automation
+  annotations:
+    description: 'Service account for DevOps automation tasks'
+    contact: 'wsparcie@budzetownik.com'
+automountServiceAccountToken: true

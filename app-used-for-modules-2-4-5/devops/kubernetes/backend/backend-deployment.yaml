@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: budzetownik
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: budzetownik
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: budzetownik
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: budzetownik-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5001
+              name: http
+          env:
+            - name: DATABASE_URL
+              value: 'postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgresql:5432/budzetownik'
+            - name: PORT
+              value: '5001'
+            - name: NODE_ENV
+              value: 'production'
+          envFrom:
+            - secretRef:
+                name: postgresql-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

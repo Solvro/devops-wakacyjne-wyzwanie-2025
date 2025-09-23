@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-migrate
+spec:
+  template:
+    spec:
+      containers:
+        - name: prisma-migrate
+          image: budzetownik-backend:latest
+          imagePullPolicy: Never
+          command: ['npx', 'prisma', 'migrate', 'deploy']
+          env:
+            - name: DATABASE_URL
+              value: 'postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgresql:5432/budzetownik'
+          envFrom:
+            - secretRef:
+                name: postgresql-secret
+      restartPolicy: Never
+  backoffLimit: 5

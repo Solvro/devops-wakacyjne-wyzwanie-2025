@@ -1,0 +1,141 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-dev
+  name: budzetownik-dev-full-access
+  labels:
+    app: budzetownik
+    rbac-type: full-access
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources:
+      [
+        'pods',
+        'services',
+        'configmaps',
+        'secrets',
+        'persistentvolumeclaims',
+        'endpoints',
+      ]
+    verbs: ['*']
+
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'statefulsets', 'daemonsets']
+    verbs: ['*']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses', 'networkpolicies']
+    verbs: ['*']
+
+  - apiGroups: ['autoscaling']
+    resources: ['horizontalpodautoscalers']
+    verbs: ['*']
+
+  - apiGroups: ['batch']
+    resources: ['jobs', 'cronjobs']
+    verbs: ['*']
+
+  - apiGroups: ['']
+    resources: ['pods/log', 'pods/exec', 'pods/portforward', 'pods/attach']
+    verbs: ['get', 'list', 'create']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['pods', 'nodes']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-prod
+  name: budzetownik-prod-read-only
+  labels:
+    app: budzetownik
+    rbac-type: read-only
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources:
+      ['pods', 'services', 'configmaps', 'endpoints', 'persistentvolumeclaims']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['apps']
+    resources: ['deployments', 'replicasets', 'statefulsets', 'daemonsets']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['networking.k8s.io']
+    resources: ['ingresses', 'networkpolicies']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['autoscaling']
+    resources: ['horizontalpodautoscalers']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['batch']
+    resources: ['jobs', 'cronjobs']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['pods/log']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['metrics.k8s.io']
+    resources: ['pods', 'nodes']
+    verbs: ['get', 'list']
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-developers-dev-binding
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    environment: dev
+subjects:
+  - kind: User
+    name: wsparcie@budzetownik.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: budzetownik-developers
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: ServiceAccount
+    name: dev-ci-sa
+    namespace: budzetownik-dev
+
+roleRef:
+  kind: Role
+  name: budzetownik-dev-full-access
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-developers-prod-binding
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    environment: prod
+subjects:
+  - kind: User
+    name: wsparcie@budzetownik.com
+    apiGroup: rbac.authorization.k8s.io
+
+  - kind: Group
+    name: budzetownik-developers
+    apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: budzetownik-prod-read-only
+  apiGroup: rbac.authorization.k8s.io

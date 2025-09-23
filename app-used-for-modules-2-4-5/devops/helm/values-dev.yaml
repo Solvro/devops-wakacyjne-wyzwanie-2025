@@ -1,0 +1,139 @@
+backend:
+  replicaCount: 1
+
+  image:
+    tag: 'dev'
+
+  service:
+    type: NodePort
+    port: 5001
+    nodePort: 30001
+
+  env:
+    NODE_ENV: development
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 120
+      periodSeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 10
+    readinessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 15
+      failureThreshold: 10
+
+frontend:
+  replicaCount: 1
+
+  image:
+    tag: 'dev'
+
+  service:
+    type: NodePort
+    port: 80
+    targetPort: 5002
+    nodePort: 30002
+
+  env:
+    NODE_ENV: development
+    NEXT_PUBLIC_API_URL: http://budzetownik-dev.local/api
+
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+database:
+  postgresql:
+    enabled: false
+  custom:
+    enabled: true
+    image:
+      tag: '13'
+    persistence:
+      enabled: true
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+databaseJobs:
+  migrate:
+    enabled: false
+    image:
+      tag: 'dev'
+  seed:
+    enabled: false
+    image:
+      repository: budzetownik-seeder
+      tag: 'dev'
+
+secrets:
+  postgresql:
+    POSTGRES_USER: ZGV2X3VzZXI=
+    POSTGRES_PASSWORD: ZGV2X3Bhc3N3b3Jk
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: budzetownik-dev.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+
+autoscaling:
+  backend:
+    enabled: false
+  frontend:
+    enabled: false
+
+podSecurityContext: {}
+
+securityContext: {}
+
+networkPolicy:
+  enabled: false

@@ -1,0 +1,312 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-dev
+  name: budzetownik-frontend-app-role
+  labels:
+    app: budzetownik
+    tier: frontend
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+    resourceNames: []
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-dev
+  name: budzetownik-backend-app-role
+  labels:
+    app: budzetownik
+    tier: backend
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list', 'watch']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['budzetownik-backend-secret', 'database-credentials']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create', 'patch']
+
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get', 'patch']
+    resourceNames: ['budzetownik-backend']
+
+  - apiGroups: ['batch']
+    resources: ['jobs']
+    verbs: ['get', 'list', 'watch', 'create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-dev
+  name: budzetownik-database-app-role
+  labels:
+    app: budzetownik
+    tier: database
+    rbac-type: app-minimal
+    environment: dev
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['database-credentials', 'postgres-secret']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-prod
+  name: budzetownik-frontend-app-role
+  labels:
+    app: budzetownik
+    tier: frontend
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-prod
+  name: budzetownik-backend-app-role
+  labels:
+    app: budzetownik
+    tier: backend
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['budzetownik-backend-secret', 'database-credentials']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['apps']
+    resources: ['deployments']
+    verbs: ['get']
+    resourceNames: ['budzetownik-backend']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: budzetownik-prod
+  name: budzetownik-database-app-role
+  labels:
+    app: budzetownik
+    tier: database
+    rbac-type: app-minimal
+    environment: prod
+rules:
+  - apiGroups: ['']
+    resources: ['pods']
+    verbs: ['get']
+
+  - apiGroups: ['']
+    resources: ['services', 'endpoints']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['configmaps']
+    verbs: ['get', 'list']
+
+  - apiGroups: ['']
+    resources: ['secrets']
+    verbs: ['get', 'list']
+    resourceNames: ['database-credentials', 'postgres-secret']
+
+  - apiGroups: ['']
+    resources: ['events']
+    verbs: ['create']
+
+  - apiGroups: ['']
+    resources: ['persistentvolumeclaims']
+    verbs: ['get', 'list']
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-frontend-app-binding
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: frontend
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-frontend-sa
+    namespace: budzetownik-dev
+roleRef:
+  kind: Role
+  name: budzetownik-frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-backend-app-binding
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: backend
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-backend-sa
+    namespace: budzetownik-dev
+roleRef:
+  kind: Role
+  name: budzetownik-backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-database-app-binding
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: database
+    environment: dev
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-database-sa
+    namespace: budzetownik-dev
+roleRef:
+  kind: Role
+  name: budzetownik-database-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-frontend-app-binding
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: frontend
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-frontend-sa
+    namespace: budzetownik-prod
+roleRef:
+  kind: Role
+  name: budzetownik-frontend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-backend-app-binding
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: backend
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-backend-sa
+    namespace: budzetownik-prod
+roleRef:
+  kind: Role
+  name: budzetownik-backend-app-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: budzetownik-database-app-binding
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: database
+    environment: prod
+subjects:
+  - kind: ServiceAccount
+    name: budzetownik-database-sa
+    namespace: budzetownik-prod
+roleRef:
+  kind: Role
+  name: budzetownik-database-app-role
+  apiGroup: rbac.authorization.k8s.io

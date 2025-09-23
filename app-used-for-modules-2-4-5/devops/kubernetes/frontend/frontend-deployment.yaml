@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: budzetownik
+    tier: frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: budzetownik
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: budzetownik
+        tier: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: budzetownik-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+              name: http
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: 'http://backend:3001'
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

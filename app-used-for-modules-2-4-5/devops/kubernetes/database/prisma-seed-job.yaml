@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-seed
+spec:
+  template:
+    spec:
+      containers:
+        - name: prisma-seed
+          image: budzetownik-seeder:latest
+          imagePullPolicy: Never
+          env:
+            - name: DATABASE_URL
+              value: 'postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgresql:5432/budzetownik'
+          envFrom:
+            - secretRef:
+                name: postgresql-secret
+      restartPolicy: Never
+  backoffLimit: 5

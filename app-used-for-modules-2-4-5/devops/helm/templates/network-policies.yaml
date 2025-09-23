@@ -1,0 +1,510 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    environment: dev
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    environment: prod
+    policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-frontend-netpol
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: frontend
+    environment: dev
+spec:
+  podSelector:
+    matchLabels:
+      tier: frontend
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 3000
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: backend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-backend-netpol
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: backend
+    environment: dev
+spec:
+  podSelector:
+    matchLabels:
+      tier: backend
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              tier: frontend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: database
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: frontend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 3000
+
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-database-netpol
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    tier: database
+    environment: dev
+spec:
+  podSelector:
+    matchLabels:
+      tier: database
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              tier: backend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app: postgres-exporter
+      ports:
+        - protocol: TCP
+          port: 5432
+
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-frontend-netpol
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: frontend
+    environment: prod
+spec:
+  podSelector:
+    matchLabels:
+      tier: frontend
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 3000
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: backend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-backend-netpol
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: backend
+    environment: prod
+spec:
+  podSelector:
+    matchLabels:
+      tier: backend
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              tier: frontend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 3001
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: database
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    - to:
+        - podSelector:
+            matchLabels:
+              tier: frontend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 3000
+
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: budzetownik-database-netpol
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    tier: database
+    environment: prod
+spec:
+  podSelector:
+    matchLabels:
+      tier: database
+      app: budzetownik
+  policyTypes:
+    - Ingress
+    - Egress
+
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              tier: backend
+              app: budzetownik
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: backup-system
+        - podSelector:
+            matchLabels:
+              app: backup-agent
+      ports:
+        - protocol: TCP
+          port: 5432
+
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+        - podSelector:
+            matchLabels:
+              app: postgres-exporter
+      ports:
+        - protocol: TCP
+          port: 5432
+
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+        - podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-ingress
+  namespace: budzetownik-dev
+  labels:
+    app: budzetownik
+    policy-type: monitoring
+    environment: dev
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-ingress
+  namespace: budzetownik-prod
+  labels:
+    app: budzetownik
+    policy-type: monitoring
+    environment: prod
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9090
+        - protocol: TCP
+          port: 8080

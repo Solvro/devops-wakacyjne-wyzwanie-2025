@@ -1,0 +1,232 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TripCategory {
+  BUSINESS
+  VACATION
+  FAMILY
+  PERSONAL
+  WEEKEND
+  LEISURE
+  OTHER
+}
+
+enum ExpenseCategory {
+  ACCOMMODATION
+  TRANSPORT
+  FOOD
+  HEALTH
+  ENTERTAINMENT
+  GIFT
+  UTILITIES
+  SHOPPING
+  INSURANCE
+  OTHER
+}
+
+enum ParticipantRole {
+  ORGANIZER
+  PARTICIPANT
+  GUEST
+  DRIVER
+  VOLUNTEER
+  GUIDE
+  OTHER
+}
+
+enum ParticipantSex {
+  FEMALE
+  MALE
+  OTHER
+}
+
+enum ActivityCategory {
+  SIGHTSEEING
+  LEISURE
+  CULTURE
+  NATURE
+  SPORTS
+  ENTERTAINMENT
+  MEDIA
+  OTHER
+}
+
+enum Role {
+  ADMIN
+  USER
+  TRIPCOORD
+  GUEST
+  OTHER
+}
+
+model Activity {
+  id         Int              @id @default(autoincrement())
+  name       String           @db.VarChar(100)
+  place      String?          @db.Text
+  startDate  DateTime?        @db.Timestamptz
+  endDate    DateTime?        @db.Timestamptz
+  category   ActivityCategory
+  note       String?          @db.Text
+  createdAt  DateTime         @default(now()) @db.Timestamptz
+  updatedAt  DateTime         @default(now()) @db.Timestamptz
+  isArchived Boolean          @default(false)
+
+  tripId       Int?
+  trip         Trip?         @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  expenses     Expense[]
+  participants Participant[] @relation("ActivityParticipants")
+}
+
+model Expense {
+  id            Int             @id @default(autoincrement())
+  title         String          @db.VarChar(255)
+  recipientName String?         @db.VarChar(100)
+  recipientIban String?         @db.VarChar(50)
+  quantity      Int?            @default(1)
+  currency      String          @default("PLN") @db.VarChar(3)
+  amount        Decimal?        @db.Decimal(10, 2)
+  budgetLeft    Decimal?        @db.Decimal(10, 2)
+  category      ExpenseCategory
+  note          String?         @db.Text
+  createdAt     DateTime        @default(now()) @db.Timestamptz
+  updatedAt     DateTime        @default(now()) @db.Timestamptz
+  isArchived    Boolean         @default(false)
+
+  participantId Int?
+  tripId        Int?
+  activityId    Int?
+  participant   Participant? @relation(fields: [participantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  trip          Trip?        @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  activity      Activity?    @relation(fields: [activityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  payment       Payment[]
+
+  @@index([tripId])
+  @@index([participantId])
+  @@index([activityId])
+}
+
+model Trip {
+  id             Int          @id @default(autoincrement())
+  title          String       @db.VarChar(255)
+  destination    String?      @db.Text
+  budget         Decimal?     @db.Decimal(10, 2)
+  startDate      DateTime?    @db.Timestamptz
+  endDate        DateTime?    @db.Timestamptz
+  accommodation  String?      @db.Text
+  travelTime     Decimal?     @db.Decimal(10, 2)
+  travelDistance Decimal?     @db.Decimal(10, 2)
+  category       TripCategory
+  note           String?      @db.Text
+  createdAt      DateTime     @default(now()) @db.Timestamptz
+  updatedAt      DateTime     @default(now()) @db.Timestamptz
+  isArchived     Boolean      @default(false)
+
+  expenses     Expense[]
+  payments     Payment[]
+  participants Participant[] @relation("TripParticipants")
+  activities   Activity[]
+}
+
+model Participant {
+  id           Int             @id @default(autoincrement())
+  name         String          @db.VarChar(100)
+  surname      String          @db.VarChar(100)
+  email        String?         @unique @db.VarChar(200)
+  phone        String?         @db.VarChar(25)
+  address      String?         @db.Text
+  iban         String?         @db.VarChar(50)
+  isAdult      Boolean         @default(true)
+  dateOfBirth  DateTime?       @db.Date
+  placeOfBirth String?         @db.Text
+  sex          ParticipantSex
+  role         ParticipantRole
+  note         String?         @db.Text
+  createdAt    DateTime        @default(now()) @db.Timestamptz
+  updatedAt    DateTime        @default(now()) @db.Timestamptz
+  isArchived   Boolean         @default(false)
+
+  expenses   Expense[]
+  payments   Payment[]
+  trips      Trip[]     @relation("TripParticipants")
+  activities Activity[] @relation("ActivityParticipants")
+  user       User[]
+}
+
+model User {
+  email      String   @id @unique @db.VarChar(200)
+  username   String?  @db.VarChar(100)
+  password   String   @db.VarChar(255)
+  role       Role
+  note       String?  @db.Text
+  lastLogin  DateTime @default(now()) @db.Timestamptz
+  createdAt  DateTime @default(now()) @db.Timestamptz
+  updatedAt  DateTime @default(now()) @db.Timestamptz
+  isArchived Boolean  @default(false)
+
+  participantId String?
+  participant   Participant? @relation(fields: [participantId], references: [email], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([participantId])
+}
+
+model Currency {
+  code        String   @id @unique @db.VarChar(3)
+  name        String   @db.VarChar(100)
+  currentRate Decimal  @db.Decimal(10, 4)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @default(now()) @db.Timestamptz
+
+  exchangeRates ExchangeRate[]
+}
+
+model ExchangeRate {
+  id        Int      @id @default(autoincrement())
+  rate      Decimal  @db.Decimal(10, 6)
+  source    String?  @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @default(now()) @db.Timestamptz
+
+  currencyId String
+  currency   Currency @relation(fields: [currencyId], references: [code], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([currencyId])
+}
+
+model Payment {
+  id               Int      @id @default(autoincrement())
+  title            String?  @db.VarChar(255)
+  description      String?  @db.Text
+  originalAmount   Decimal  @db.Decimal(10, 2)
+  originalCurrency String   @db.VarChar(3)
+  amountPLN        Decimal  @db.Decimal(10, 2)
+  exchangeRate     Decimal  @db.Decimal(10, 6)
+  paymentDate      DateTime @default(now()) @db.Timestamptz
+  createdAt        DateTime @default(now()) @db.Timestamptz
+  updatedAt        DateTime @default(now()) @db.Timestamptz
+  isArchived       Boolean  @default(false)
+
+  participantId Int?
+  tripId        Int?
+  expenseId     Int?
+  participant   Participant? @relation(fields: [participantId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  trip          Trip?        @relation(fields: [tripId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  expense       Expense?     @relation(fields: [expenseId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([tripId])
+  @@index([participantId])
+  @@index([expenseId])
+}

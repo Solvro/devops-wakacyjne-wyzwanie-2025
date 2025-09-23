@@ -1,0 +1,25 @@
+apiVersion: v2
+name: budzetownik-chart
+description: A Helm chart for budzetownik fullstack webapp
+type: application
+version: 0.1.0
+appVersion: '0.1.0'
+
+maintainers:
+  - name: wsparcie
+    url: https://github.com/wsparcie
+
+home: https://wsparcie.github.io/
+sources:
+  - https://github.com/wsparcie/budzetownik
+
+keywords:
+  - webapp
+  - manager
+  - nestjs
+  - nextjs
+  - postgresql
+  - fullstack
+  - expense
+  - trip
+  - participant

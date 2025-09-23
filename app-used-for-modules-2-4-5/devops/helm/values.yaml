@@ -1,0 +1,236 @@
+global:
+  imageRegistry: ''
+  imagePullSecrets: []
+  storageClass: ''
+
+app:
+  name: budzetownik
+  version: 1.0.0
+
+backend:
+  enabled: true
+  name: backend
+  replicaCount: 2
+
+  image:
+    repository: budzetownik-backend
+    tag: 'latest'
+    pullPolicy: Never
+
+  service:
+    type: ClusterIP
+    port: 5001
+    targetPort: 5001
+    name: http
+
+  env:
+    NODE_ENV: production
+    PORT: '5001'
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /wakacyjne/health
+        port: http
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  revisionHistoryLimit: 5
+
+frontend:
+  enabled: true
+  name: frontend
+  replicaCount: 2
+
+  image:
+    repository: budzetownik-frontend
+    tag: 'latest'
+    pullPolicy: Never
+
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 5002
+
+  env:
+    NODE_ENV: production
+    PORT: '5002'
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  healthChecks:
+    enabled: true
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 5002
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 3
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  revisionHistoryLimit: 5
+
+database:
+  postgresql:
+    enabled: false
+    auth:
+      postgresPassword: 'budzetownik_password'
+      username: 'budzetownik_user'
+      password: 'budzetownik_password'
+      database: 'budzetownik'
+    primary:
+      persistence:
+        enabled: true
+        size: 2Gi
+        storageClass: 'standard'
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+  custom:
+    enabled: true
+    image:
+      repository: postgres
+      tag: '13'
+      pullPolicy: IfNotPresent
+
+    persistence:
+      enabled: true
+      size: 2Gi
+      storageClass: 'standard'
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+databaseJobs:
+  migrate:
+    enabled: true
+    image:
+      repository: budzetownik-backend
+      tag: 'latest'
+      pullPolicy: Never
+    backoffLimit: 5
+    restartPolicy: Never
+
+  seed:
+    enabled: true
+    image:
+      repository: budzetownik-seeder
+      tag: 'latest'
+      pullPolicy: Never
+    backoffLimit: 5
+    restartPolicy: Never
+
+secrets:
+  postgresql:
+    POSTGRES_USER: YnVkemV0b3duaWtfdXNlcg== # budzetownik_user
+    POSTGRES_PASSWORD: YnVkemV0b3duaWtfcGFzc3dvcmQ= # budzetownik_password
+
+config: {}
+
+ingress:
+  enabled: false
+  className: 'nginx'
+  annotations: {}
+  hosts:
+    - host: budzetownik.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls: []
+
+autoscaling:
+  backend:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'budzetownik-prod-budzetownik-chart-backend'
+
+  frontend:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+    targetDeployment: 'budzetownik-prod-budzetownik-chart-frontend'
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ''
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+networkPolicy:
+  enabled: false
