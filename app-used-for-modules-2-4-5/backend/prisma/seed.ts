@@ -17,6 +17,197 @@ async function main() {
   await prisma.activity.deleteMany();
   await prisma.trip.deleteMany();
   await prisma.participant.deleteMany();
+  await prisma.exchangeRate.deleteMany();
+  await prisma.currency.deleteMany();
+
+  await Promise.all([
+    prisma.currency.create({
+      data: {
+        code: "EUR",
+        name: "Euro",
+        currentRate: "4.3250",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "USD",
+        name: "United States Dollar",
+        currentRate: "4.0150",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "GBP",
+        name: "British Pound",
+        currentRate: "5.1500",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "CHF",
+        name: "Swiss Franc",
+        currentRate: "4.4800",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "CZK",
+        name: "Czech Koruna",
+        currentRate: "0.1750",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "SEK",
+        name: "Swedish Krona",
+        currentRate: "0.3900",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "NOK",
+        name: "Norwegian Krone",
+        currentRate: "0.3800",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "DKK",
+        name: "Danish Krone",
+        currentRate: "0.5800",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "JPY",
+        name: "Japanese Yen",
+        currentRate: "0.0270",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "CAD",
+        name: "Canadian Dollar",
+        currentRate: "2.9500",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "AUD",
+        name: "Australian Dollar",
+        currentRate: "2.6800",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "NZD",
+        name: "New Zealand Dollar",
+        currentRate: "2.4200",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "HUF",
+        name: "Hungarian Forint",
+        currentRate: "0.0110",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "CNH",
+        name: "Chinese Yuan",
+        currentRate: "0.5650",
+        isActive: true,
+      },
+    }),
+
+    prisma.currency.create({
+      data: {
+        code: "THB",
+        name: "Thai Baht",
+        currentRate: "0.1180",
+        isActive: true,
+      },
+    }),
+  ]);
+
+  await Promise.all([
+    prisma.exchangeRate.create({
+      data: {
+        currencyId: "EUR",
+        rate: "4.3250",
+        source: "waluty24.info",
+        isActive: true,
+        createdAt: new Date("2025-09-24T06:00:00Z"),
+      },
+    }),
+
+    prisma.exchangeRate.create({
+      data: {
+        currencyId: "EUR",
+        rate: "4.3180",
+        source: "waluty24.info",
+        isActive: true,
+        createdAt: new Date("2025-09-23T06:00:00Z"),
+      },
+    }),
+
+    prisma.exchangeRate.create({
+      data: {
+        currencyId: "USD",
+        rate: "4.0150",
+        source: "waluty24.info",
+        isActive: true,
+        createdAt: new Date("2025-09-24T06:00:00Z"),
+      },
+    }),
+
+    prisma.exchangeRate.create({
+      data: {
+        currencyId: "USD",
+        rate: "4.0080",
+        source: "waluty24.info",
+        isActive: true,
+        createdAt: new Date("2025-09-23T06:00:00Z"),
+      },
+    }),
+
+    prisma.exchangeRate.create({
+      data: {
+        currencyId: "GBP",
+        rate: "5.1500",
+        source: "waluty24.info",
+        isActive: true,
+        createdAt: new Date("2025-09-24T06:00:00Z"),
+      },
+    }),
+  ]);
 
   const createdParticipants = await Promise.all([
     prisma.participant.create({
@@ -629,7 +820,7 @@ async function main() {
       data: {
         email: "jan.kowalski@imejl.pl",
         username: "janko",
-        password: password,
+        password,
         role: Role.ADMIN,
         isArchived: false,
         participant: {
