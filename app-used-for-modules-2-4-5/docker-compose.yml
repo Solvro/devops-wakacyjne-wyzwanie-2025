@@ -1,0 +1,64 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - '5001:5001'
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@db:5432/budzetownik
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./backend/prisma:/app/prisma
+      - ./backend/entrypoint.sh:/app/entrypoint.sh
+    networks:
+      - expearti-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - '5002:5002'
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    networks:
+      - expearti-net
+
+  db:
+    image: postgres:14-alpine
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: budzetownik
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - expearti-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - expearti-net
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  expearti-net:
+    driver: bridge
