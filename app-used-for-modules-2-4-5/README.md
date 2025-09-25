@@ -4,20 +4,20 @@
 <div align="center">
   <h1>your trips budget manager</h1>
 </div>
-The full-stack application for managing vacation budgets, trip expenses, and participant coordination. Built with NestJS backend, Next.js frontend, and Kubernetes-ready deployment infrastructure.
+
+A full-stack application for managing vacation budgets, trip expenses, and participant coordination. Built with NestJS backend, Next.js frontend, and Kubernetes-ready deployment infrastructure.
 
 ![Dashboard](budzetownik.png)
 
 ## Features
 
-- **Trip Management**: Create and manage vacation trips with detailed planning
 - **Expense Tracking**: Track expenses across different categories
+- **Trip Management**: Create and manage vacation trips with detailed planning
 - **Participant Management**: Manage trip participants with roles and responsibilities
 - **Activity Planning**: Plan and track trip activities with scheduling
 - **Currency Support**: Multi-currency support with real-time exchange rates
 - **Payment Management**: Track payments and settlements between participants
 - **Email Notifications**: Automated email notifications for participants
-- **User Authentication**: JWT-based authentication with role-based access control
 - **Data Export**: Generate reports and summaries for trips and expenses
 
 ## Architecture
@@ -28,8 +28,9 @@ The full-stack application for managing vacation budgets, trip expenses, and par
 - **Cache**: Redis for session management and caching
 - **Queue**: BullMQ for background job processing
 - **Infrastructure**: Kubernetes with Helm charts for deployment
+- **ERD**: [PostgreSQL Diagram on drawSQL](https://drawsql.app/teams/wsparcie/diagrams/budzetownik/embed)
 
-## Quick Start
+## Launch
 
 ### Prerequisites
 
@@ -142,26 +143,6 @@ kubectl apply -f backend/
 kubectl apply -f frontend/
 ```
 
-## Database Schema
-
-[PostgreSQL Diagram on drawSQL](https://drawsql.app/teams/wsparcie/diagrams/budzetownik/embed):
-
-- **Users**: Authentication and user management
-- **Trips**: Main trip entities with categories and budgets
-- **Participants**: People involved in trips with roles
-- **Activities**: Planned activities within trips
-- **Expenses**: Expense tracking with categories
-- **Payments**: Payment records and settlements
-- **Currencies**: Multi-currency support with exchange rates
-
-### Key Relationships
-
-- Users can participate in multiple trips
-- Trips contain multiple activities and expenses
-- Participants can be assigned to specific activities
-- Expenses can be linked to trips, activities, or participants
-- Payments track financial transactions between participants
-
 ## Environment Variables
 
 ### Backend (.env)
@@ -183,25 +164,6 @@ EMAIL_PASS="your-email-password"
 ```bash
 NEXT_PUBLIC_API_URL="http://localhost:5001"
 ```
-
-## Security
-
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Input validation using class-validator
-- CORS configuration for cross-origin requests
-- Environment-based configuration
-- Secure password hashing with bcrypt
-
-## Deployment
-
-1. **Environment Variables**: Ensure all production environment variables are set
-2. **Database**: Use managed PostgreSQL service (e.g., AWS RDS, Google Cloud SQL)
-3. **Redis**: Use managed Redis service for production
-4. **SSL**: Enable HTTPS with proper SSL certificates
-5. **Monitoring**: Set up application monitoring and logging
-6. **Backup**: Configure database backups
-7. **Scaling**: Use Kubernetes horizontal pod autoscaling
 
 ## License
 
