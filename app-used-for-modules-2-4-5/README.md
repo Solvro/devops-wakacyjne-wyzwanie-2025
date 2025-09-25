@@ -41,14 +41,7 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
 
 ### Development Setup
 
-1. **Clone the repository**
-
-   ```bash
-   git clone <repository-url>
-   cd budzetownik
-   ```
-
-2. **Backend Setup**
+1. **Backend Setup**
 
    ```bash
    cd backend
@@ -70,7 +63,7 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
    npm run start:dev
    ```
 
-3. **Frontend Setup**
+2. **Frontend Setup**
 
    ```bash
    cd frontend
@@ -83,7 +76,7 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
    npm run dev
    ```
 
-4. **Access the application**
+3. **Access the application**
    - Frontend: http://localhost:5002
    - Backend API: http://localhost:5001
    - API Documentation: http://localhost:5001/api
