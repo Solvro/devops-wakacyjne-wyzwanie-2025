@@ -32,9 +32,9 @@ export default function Dashboard() {
     nextEvent: '',
   }
 
-  const { data: participants } = useQuery<Participant[]>({
-    queryKey: ['participants'],
-    queryFn: () => participantApi.getAll(),
+  const { data: expenses } = useQuery<Expense[]>({
+    queryKey: ['expenses'],
+    queryFn: () => expenseApi.getAll(),
     enabled: isAuthenticated,
   })
 
@@ -44,9 +44,9 @@ export default function Dashboard() {
     enabled: isAuthenticated,
   })
 
-  const { data: expenses } = useQuery<Expense[]>({
-    queryKey: ['expenses'],
-    queryFn: () => expenseApi.getAll(),
+  const { data: participants } = useQuery<Participant[]>({
+    queryKey: ['participants'],
+    queryFn: () => participantApi.getAll(),
     enabled: isAuthenticated,
   })
 

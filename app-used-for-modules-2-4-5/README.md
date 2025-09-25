@@ -7,7 +7,7 @@
 
 A full-stack application for managing vacation budgets, trip expenses, and participant coordination. Built with NestJS backend, Next.js frontend, and Kubernetes-ready deployment infrastructure.
 
-![Dashboard](budzetownik.png)
+![Dashboard](expearti.png)
 
 ## Features
 

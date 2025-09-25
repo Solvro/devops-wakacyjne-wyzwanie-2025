@@ -21,28 +21,28 @@ const navigationItems = [
     description: 'Overview and quick actions',
   },
   {
-    label: 'Trips',
-    href: '/trips',
-    icon: MapPin,
-    description: 'Plan your trips',
-  },
-  {
     label: 'Expenses',
     href: '/expenses',
     icon: DollarSign,
     description: 'Track your spending',
   },
   {
-    label: 'Activities',
-    href: '/activities',
-    icon: Calendar,
-    description: 'Schedule trip activities',
+    label: 'Trips',
+    href: '/trips',
+    icon: MapPin,
+    description: 'Plan your trips',
   },
   {
     label: 'Participants',
     href: '/participants',
     icon: Users,
     description: 'Manage trip participants',
+  },
+  {
+    label: 'Activities',
+    href: '/activities',
+    icon: Calendar,
+    description: 'Schedule trip activities',
   },
 ]
 
