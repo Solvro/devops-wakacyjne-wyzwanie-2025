@@ -6,9 +6,10 @@ services:
     container_name: backend
     ports:
       - '5001:5001'
+    env_file:
+      - ./backend/.env
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:password@db:5432/budzetownik
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
