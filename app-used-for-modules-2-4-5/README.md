@@ -1,8 +1,18 @@
+
 <div align="center">
-  <img src="expearti_white.png" alt="EXPEARTI">
-</div>
-<div align="center">
-  <h1>your trips budget manager</h1>
+   <img src="expearti_white.png" alt="EXPEARTI">
+   <br/>
+   <h1>your trips budget manager</h1>
+   <br/>
+   <!-- Badges -->
+   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-18.x-green.svg" alt="Node.js"></a>
+   <a href="https://nestjs.com/"><img src="https://img.shields.io/badge/NestJS-11.x-red.svg" alt="NestJS"></a>
+   <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15.x-black.svg" alt="Next.js"></a>
+   <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-14.x-blue.svg" alt="PostgreSQL"></a>
+   <a href="https://redis.io/"><img src="https://img.shields.io/badge/Redis-7.x-red.svg" alt="Redis"></a>
+   <a href="https://kubernetes.io/"><img src="https://img.shields.io/badge/Kubernetes-1.29-blue.svg" alt="Kubernetes"></a>
+   <a href="https://helm.sh/"><img src="https://img.shields.io/badge/Helm-3.x-informational.svg" alt="Helm"></a>
+   <a href="#"><img src="https://img.shields.io/badge/Status-Alpha-yellow.svg" alt="Status"></a>
 </div>
 
 A full-stack application for managing vacation budgets, trip expenses, and participant coordination. Built with NestJS backend, Next.js frontend, and Kubernetes-ready deployment infrastructure.
@@ -39,7 +49,7 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
 - PostgreSQL (if running locally)
 - Redis (if running locally)
 
-### Quick Start with Docker (Recommended)
+### Quick Start with Docker
 
 1. **Clone and setup environment**
    ```bash
