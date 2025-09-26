@@ -28,6 +28,8 @@ services:
     container_name: frontend
     ports:
       - '5002:5002'
+    environment:
+      - NODE_ENV=production
     env_file:
       - ./frontend/.env
     depends_on:
@@ -50,21 +52,6 @@ services:
     networks:
       - expearti-net
 
-  db_test:
-    image: postgres:14-alpine
-    container_name: db_test
-    restart: always
-    env_file:
-      - ./backend/.env
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB_TEST:-budzetownik_test}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
-    volumes:
-      - db_test_data:/var/lib/postgresql/data
-    networks:
-      - expearti-net
-
   redis:
     image: redis:7-alpine
     container_name: redis
@@ -75,7 +62,6 @@ services:
 
 volumes:
   db_data:
-  db_test_data:
   redis_data:
 
 networks:
