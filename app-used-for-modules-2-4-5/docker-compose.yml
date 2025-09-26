@@ -39,12 +39,29 @@ services:
     image: postgres:14-alpine
     container_name: db
     restart: always
+    env_file:
+      - ./backend/.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: budzetownik
+      - POSTGRES_DB=${POSTGRES_DB:-budzetownik}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - expearti-net
+
+  db_test:
+    image: postgres:14-alpine
+    container_name: db_test
+    restart: always
+    env_file:
+      - ./backend/.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB_TEST:-budzetownik_test}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password}
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
     networks:
       - expearti-net
 
@@ -58,6 +75,7 @@ services:
 
 volumes:
   db_data:
+  db_test_data:
   redis_data:
 
 networks:
