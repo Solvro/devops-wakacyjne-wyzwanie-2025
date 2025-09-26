@@ -39,7 +39,37 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
 - PostgreSQL (if running locally)
 - Redis (if running locally)
 
-### Development Setup
+### Quick Start with Docker (Recommended)
+
+1. **Clone and setup environment**
+   ```bash
+   git clone <repository-url>
+   cd <repository-name>
+
+   # Setup backend environment
+   cd backend
+   cp .env.example .env
+   # Edit .env file with your values (see Environment Variables section below)
+   cd ..
+
+   # Setup frontend environment
+   cd frontend
+   cp .env.example .env.local
+   # Edit .env.local file with your values
+   cd ..
+   ```
+
+2. **Build and start all services**
+   ```bash
+   docker compose up --build
+   ```
+
+3. **Access the application**
+   - Frontend: http://localhost:5002
+   - Backend API: http://localhost:5001
+   - API Documentation: http://localhost:5001/api
+
+### Development Setup (Local)
 
 1. **Backend Setup**
 
@@ -49,9 +79,10 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
 
    # Set up environment variables
    cp .env.example .env
+   # Edit .env with your database and Redis configuration
 
    # Start database with Docker
-   docker-compose up db redis -d
+   docker compose up db redis -d
 
    # Run database migrations
    npm run db:reset
@@ -76,27 +107,35 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
    npm run dev
    ```
 
-3. **Access the application**
-   - Frontend: http://localhost:5002
-   - Backend API: http://localhost:5001
-   - API Documentation: http://localhost:5001/api
-
 ## Docker Deployment
+
 ### Using Docker Compose
 
 ```bash
 # Build and start all services
-docker-compose up --build
+docker compose up --build
 
 # Run in detached mode
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop services
-docker-compose down
+docker compose down
+
+# Remove volumes (WARNING: This will delete all data)
+docker compose down -v
 ```
+
+### Docker Services
+
+The Docker setup includes:
+- **backend**: NestJS API server (port 5001)
+- **frontend**: Next.js application (port 5002)
+- **db**: PostgreSQL database
+- **db_test**: PostgreSQL test database
+- **redis**: Redis cache and queue
 
 ## Kubernetes Deployment
 
@@ -139,22 +178,83 @@ kubectl apply -f frontend/
 
 ### Backend (.env)
 
+Create a `.env` file in the `backend/` directory based on `.env.example`:
+
 ```bash
-DATABASE_URL="postgresql://user:password@localhost:5432/budzetownik"
-JWT_SECRET="your-jwt-secret"
-JWT_EXPIRES_IN="7d"
-REDIS_HOST="localhost"
+# Database Configuration
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_secure_password_here
+POSTGRES_DB=budzetownik
+POSTGRES_DB_TEST=budzetownik_test
+
+# Database URLs
+DATABASE_URL="postgresql://postgres:your_secure_password_here@db:5432/budzetownik"
+DATABASE_URL_TEST="postgresql://postgres:your_secure_password_here@db_test:5432/budzetownik_test"
+
+# Application Configuration
+NODE_ENV=development
+PORT=5001
+EXPIRY_TIME_MS=3600000
+
+# JWT Configuration
+JWT_SECRET=your-jwt-secret-key
+
+# Redis Configuration
+REDIS_HOST=redis
 REDIS_PORT=6379
-EMAIL_HOST="smtp.gmail.com"
+
+# Email Configuration (Gmail example)
+EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER="your-email@gmail.com"
-EMAIL_PASS="your-email-password"
+EMAIL_FROM="Budzetownik <your-email@gmail.com>"
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-specific-password
 ```
 
 ### Frontend (.env.local)
 
+Create a `.env.local` file in the `frontend/` directory based on `.env.example`:
+
 ```bash
-NEXT_PUBLIC_API_URL="http://localhost:5001"
+NEXT_PUBLIC_API_URL=http://localhost:5001
+```
+
+## Troubleshooting
+
+### Docker Issues
+
+If you encounter database connection issues:
+
+1. **Check if containers are running**:
+   ```bash
+   docker compose ps
+   ```
+
+2. **View container logs**:
+   ```bash
+   docker compose logs backend
+   docker compose logs db
+   ```
+
+3. **Reset database volumes** (WARNING: This deletes all data):
+   ```bash
+   docker compose down -v
+   docker compose up --build
+   ```
+
+### Database Issues
+
+If you need to reset the database:
+
+```bash
+# Stop containers
+docker compose down
+
+# Remove database volumes
+docker volume rm $(docker volume ls -q | grep db)
+
+# Start fresh
+docker compose up --build
 ```
 
 ## License
