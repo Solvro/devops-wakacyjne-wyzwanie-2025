@@ -82,7 +82,6 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
    - API Documentation: http://localhost:5001/api
 
 ## Docker Deployment
-
 ### Using Docker Compose
 
 ```bash
