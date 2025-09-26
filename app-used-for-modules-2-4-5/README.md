@@ -10,7 +10,7 @@
    <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15.x-black.svg" alt="Next.js"></a>
    <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-14.x-blue.svg" alt="PostgreSQL"></a>
    <a href="https://redis.io/"><img src="https://img.shields.io/badge/Redis-7.x-red.svg" alt="Redis"></a>
-   <a href="https://kubernetes.io/"><img src="https://img.shields.io/badge/Kubernetes-1.29-blue.svg" alt="Kubernetes"></a>
+   <a href="https://kubernetes.io/"><img src="https://img.shields.io/badge/Kubernetes-1.x-blue.svg" alt="Kubernetes"></a>
    <a href="https://helm.sh/"><img src="https://img.shields.io/badge/Helm-3.x-informational.svg" alt="Helm"></a>
    <a href="#"><img src="https://img.shields.io/badge/Status-Alpha-yellow.svg" alt="Status"></a>
 </div>
@@ -42,12 +42,6 @@ A full-stack application for managing vacation budgets, trip expenses, and parti
 
 ## Launch
 
-### Prerequisites
-
-- Node.js 18+ and npm
-- Docker and Docker Compose
-- PostgreSQL (if running locally)
-- Redis (if running locally)
 
 ### Quick Start with Docker
 
@@ -137,15 +131,6 @@ docker compose down
 # Remove volumes (WARNING: This will delete all data)
 docker compose down -v
 ```
-
-### Docker Services
-
-The Docker setup includes:
-- **backend**: NestJS API server (port 5001)
-- **frontend**: Next.js application (port 5002)
-- **db**: PostgreSQL database
-- **db_test**: PostgreSQL test database
-- **redis**: Redis cache and queue
 
 ## Kubernetes Deployment
 
