@@ -1,0 +1,14 @@
+replicaCount: 3
+
+service:
+  type: ClusterIP
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+config:
+  appMode: "production"
+  logLevel: "info"
